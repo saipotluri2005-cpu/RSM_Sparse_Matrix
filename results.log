@@ -1,0 +1,6 @@
+Allocating Dense Matrix (6691 x 6691)...
+Matrix Size:        6691 x 6691
+Iterations Taken:   5000
+Solve Time:         176946 ms
+Relative Residual:  1.02463
+Solution saved to:  barth_dense_solution.txt
