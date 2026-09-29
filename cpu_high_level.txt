@@ -1,0 +1,13 @@
+[ Step 1: CPU ] Read Problem Data ──> Create Raw COO List (Row, Col, Value)
+        │
+        ▼
+[ Step 2: CPU ] Check Sparsity Ratio ──> (Count Non-Zeros / Total Size)
+        │
+        ▼
+[ Step 3: CPU ] Run RCM Reordering ──> Move non-zeros close to main diagonal
+        │
+        ▼
+[ Step 4: CPU ] Convert Format ──> Convert COO to CSR/BSR (strip out zero values)
+        │
+        ▼
+[ Step 5: GPU ] Execute Math ──> Run cuSPARSE matrix-vector multiplication (SpMV)
