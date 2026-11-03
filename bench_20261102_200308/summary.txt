@@ -1,0 +1,10 @@
+=== Poisson n=30  (900 x 900) ===
+threads      min ms   median ms  speedup   effic    iters   max resid  check
+      1      11.469      11.803    1.00x    100%       43    9.83e-06  ok
+
+=== Poisson n=60  (3600 x 3600) ===
+threads      min ms   median ms  speedup   effic    iters   max resid  check
+      1     390.173     392.124    1.00x    100%       87    9.64e-06  ok
+
+speedup = min time at lowest thread count / min time at N threads
+effic   = speedup / (threads / lowest thread count)

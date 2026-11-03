@@ -1,0 +1,33 @@
+=== fs_183_1  (183 x 183) ===
+threads      min ms   median ms  speedup   effic    iters   max resid  status
+      1      40.281      42.106    1.00x    100%     5000    1.39e+19  NO_CONVERGE
+
+=== gemat11  (4929 x 4929) ===
+threads      min ms   median ms  speedup   effic    iters   max resid  status
+      1   42118.700   42354.800    1.00x    100%     5000    1.03e+21  NO_CONVERGE
+
+=== poisson2d_30  (900 x 900) ===
+threads      min ms   median ms  speedup   effic    iters   max resid  status
+      1      11.697      11.730    1.00x    100%       43    9.83e-06  ok
+
+=== poisson2d_60  (3600 x 3600) ===
+threads      min ms   median ms  speedup   effic    iters   max resid  status
+      1     392.259     395.082    1.00x    100%       87    9.64e-06  ok
+
+=== west0167  (167 x 167) ===
+threads      min ms   median ms  speedup   effic    iters   max resid  status
+      1      33.334      33.457    1.00x    100%     5000    4.14e+20  NO_CONVERGE
+
+=== OVERVIEW: all solved matrices ===
+matrix                       N  iters status          T_lo       ms@lo  T_hi       ms@hi
+fs_183_1                   183   5000 NO_CONVERGE        1      40.281     1      40.281
+gemat11                   4929   5000 NO_CONVERGE        1   42118.700     1   42118.700
+poisson2d_30               900     43 ok                 1      11.697     1      11.697
+poisson2d_60              3600     87 ok                 1     392.259     1     392.259
+west0167                   167   5000 NO_CONVERGE        1      33.334     1      33.334
+
+=== NOT SOLVED (skipped or broke down) ===
+barth_coord            SKIPPED: not a real coordinate-format matrix. Header: %%MatrixMarket matrix array real general
+
+speedup = min time at lowest thread count / min time at N threads
+status NO_CONVERGE / BAD usually means the matrix is not symmetric positive definite.

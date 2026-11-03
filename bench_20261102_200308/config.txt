@@ -1,0 +1,7 @@
+date:      Mon Nov  2 08:03:08 PM CST 2026
+host:      login1   cores: 1
+sizes:     30 60
+threads:    1
+reps:      3
+MAX_DENSE_GB=2 OMP_PLACES=cores OMP_PROC_BIND=close
+binary:    /home1/11810/aarav_lakdawala/multithreading/RSM_Sparse_Matrix/cpu_only

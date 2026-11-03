@@ -1,0 +1,12 @@
+date:      Mon Nov  2 08:04:54 PM CST 2026
+host:      login1   cores: 1
+threads:    1
+reps:      3
+matrices:  6 file(s)
+  /home1/11810/aarav_lakdawala/multithreading/RSM_Sparse_Matrix/Matrices/barth_coord.mtx
+  /home1/11810/aarav_lakdawala/multithreading/RSM_Sparse_Matrix/Matrices/fs_183_1.mtx
+  /home1/11810/aarav_lakdawala/multithreading/RSM_Sparse_Matrix/Matrices/gemat11.mtx
+  /home1/11810/aarav_lakdawala/multithreading/RSM_Sparse_Matrix/Matrices/poisson2d_30.mtx
+  /home1/11810/aarav_lakdawala/multithreading/RSM_Sparse_Matrix/Matrices/poisson2d_60.mtx
+  /home1/11810/aarav_lakdawala/multithreading/RSM_Sparse_Matrix/Matrices/west0167.mtx
+MAX_DENSE_GB=2 OMP_PLACES=cores OMP_PROC_BIND=close
