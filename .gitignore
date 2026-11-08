@@ -1,0 +1,16 @@
+# build outputs
+cpu_only
+cpu_sparse
+*_tsan
+*.o
+
+# per-run outputs (regenerate with make bench / sbatch)
+*_solution.txt
+benchall_*/
+perfrun_*/
+bench_matrices/
+cg_bench_all.*.txt
+cg_bench_perf.*.txt
+perf.data*
+cachegrind.out.*
+__pycache__/

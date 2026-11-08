@@ -17,15 +17,18 @@
 #         automatically from Part A (largest converged matrix), or set
 #         REP_MATRIX=<label> to pick one.
 #
-# Build first (frame pointers + -g so perf can attribute time and walk stacks):
-#   g++ -O3 -g -fno-omit-frame-pointer -mcpu=native -std=c++17 -fopenmp \
-#       cg_omp.cpp -o cg_omp
+# Build first:  make            (cpu_sparse is built with -g -fno-omit-frame-pointer)
 #
-#   sbatch cg_bench_perf.sh
+#   sbatch cg_perf.slurm                     profiles cpu_sparse
+#   EXE=./cpu_only sbatch cg_perf.slurm      profiles the dense version
+#
+# Matrices come from the test_matrices branch (same worktree as benchmark.sh).
+# For the dense-vs-sparse comparison and plots, use benchmark.sh instead.
 #
 # Optional environment variables:
-#   EXE=path               solver binary (default: ./cg_omp, else ./cpu_only)
-#   MATRICES=path          folder to scan            (default: ./Matrices)
+#   EXE=path               solver binary (default: ./cpu_sparse, else ./cpu_only)
+#   TEST_DIR=path          folder to scan  (default: test_matrices branch worktree)
+#   TEST_BRANCH=name       branch holding the matrices (default: test_matrices)
 #   POISSON_SIZES="30 60"  also generate and run these Poisson grids
 #   THREADS="1 2 4 8"      thread counts (default: powers of two up to cores)
 #   REPS=3                 repeats per (matrix, threads)
@@ -44,12 +47,33 @@ else
 fi
 
 if [ -z "${EXE:-}" ]; then
-    if   [ -x "$ROOT/cg_omp" ];   then EXE="$ROOT/cg_omp"
-    elif [ -x "$ROOT/cpu_only" ]; then EXE="$ROOT/cpu_only"
-    else EXE="$ROOT/cg_omp"; fi
+    if   [ -x "$ROOT/cpu_sparse" ]; then EXE="$ROOT/cpu_sparse"
+    elif [ -x "$ROOT/cpu_only" ];   then EXE="$ROOT/cpu_only"
+    else EXE="$ROOT/cpu_sparse"; fi
 fi
 GEN="${GEN:-$ROOT/gen_poisson.py}"
-MATRICES="${MATRICES:-$ROOT/Matrices}"
+TEST_BRANCH="${TEST_BRANCH:-test_matrices}"
+export SAVE_SOLUTION=0
+
+# ---- Test matrices from the test_matrices branch (git worktree) -----------
+if [ -n "${TEST_DIR:-}" ]; then
+    MATRICES="$TEST_DIR"
+else
+    WT="$(dirname "$ROOT")/RSM_test_matrices"
+    git -C "$ROOT" fetch -q origin "$TEST_BRANCH" 2> /dev/null
+    if git -C "$ROOT" rev-parse -q --verify "origin/$TEST_BRANCH" > /dev/null; then
+        REF="origin/$TEST_BRANCH"
+    else
+        REF="$TEST_BRANCH"
+    fi
+    if [ -d "$WT" ]; then
+        git -C "$WT" checkout -q --detach "$REF" || { echo "ERROR: cannot update $WT"; exit 1; }
+    else
+        git -C "$ROOT" worktree add -q --detach "$WT" "$REF" ||
+            { echo "ERROR: cannot check out branch $TEST_BRANCH into $WT"; exit 1; }
+    fi
+    MATRICES="$WT"
+fi
 POISSON_SIZES="${POISSON_SIZES:-}"
 NUMA_DELAY="${NUMA_DELAY:-20}"
 
@@ -80,7 +104,8 @@ export OMP_PLACES=cores
 export OMP_PROC_BIND=close
 
 # ---- Collect matrices -------------------------------------------------------
-mapfile -t FILES < <(find "$MATRICES" -type f \( -name '*.mtx' -o -name '*.mtx.gz' \) | sort)
+mapfile -t FILES < <(find "$MATRICES" -path '*/.git' -prune -o -type f \
+                          \( -name '*.mtx' -o -name '*.mtx.gz' \) -print | sort)
 
 if [ -n "$POISSON_SIZES" ]; then
     GENDIR="$ROOT/bench_matrices"
@@ -99,7 +124,7 @@ fi
 
 # ---- Output folder ----------------------------------------------------------
 STAMP=$(date +%Y%m%d_%H%M%S)
-OUT="$ROOT/benchall_${SLURM_JOB_ID:-$STAMP}"
+OUT="$ROOT/perfrun_$(basename "$EXE")_${SLURM_JOB_ID:-$STAMP}"
 WORK="$OUT/work"
 PERF="$OUT/perf"
 mkdir -p "$OUT" "$WORK" "$PERF"
