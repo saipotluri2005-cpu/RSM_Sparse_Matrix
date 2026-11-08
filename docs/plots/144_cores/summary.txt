@@ -1,0 +1,166 @@
+=== poisson2d_30  [cpu_only]  (900 x 900) ===
+threads      min ms   median ms  speedup   effic    iters   max resid  status
+      1      12.341      12.693    1.00x    100%       43    9.83e-06  ok
+      2       6.136       6.157    2.01x    101%       43    9.83e-06  ok
+      4       3.208       3.242    3.85x     96%       43    9.83e-06  ok
+      8       1.710       1.721    7.22x     90%       43    9.83e-06  ok
+     16       1.260       1.271    9.79x     61%       43    9.83e-06  ok
+     32       1.318       1.327    9.36x     29%       43    9.83e-06  ok
+     64       1.898       1.920    6.50x     10%       43    9.83e-06  ok
+    128       4.011       4.062    3.08x      2%       43    9.83e-06  ok
+    144       4.193       4.594    2.94x      2%       43    9.83e-06  ok
+
+=== poisson2d_30  [cpu_sparse]  (900 x 900) ===
+threads      min ms   median ms  speedup   effic    iters   max resid  status
+      1       0.152       0.154    1.00x    100%       43    9.83e-06  ok
+      2       0.228       0.231    0.67x     33%       43    9.83e-06  ok
+      4       0.353       0.356    0.43x     11%       43    9.83e-06  ok
+      8       0.546       0.567    0.28x      3%       43    9.83e-06  ok
+     16       0.986       1.026    0.15x      1%       43    9.83e-06  ok
+     32       1.833       1.843    0.08x      0%       43    9.83e-06  ok
+     64       3.761       3.891    0.04x      0%       43    9.83e-06  ok
+    128      12.546      13.665    0.01x      0%       43    9.83e-06  ok
+    144      15.357      15.389    0.01x      0%       43    9.83e-06  ok
+
+=== poisson2d_60  [cpu_only]  (3600 x 3600) ===
+threads      min ms   median ms  speedup   effic    iters   max resid  status
+      1     415.902     471.264    1.00x    100%       87    9.64e-06  ok
+      2     205.256     208.814    2.03x    101%       87    9.64e-06  ok
+      4     102.777     103.453    4.05x    101%       87    9.64e-06  ok
+      8      56.852      59.647    7.32x     91%       87    9.64e-06  ok
+     16      33.440      33.871   12.44x     78%       87    9.64e-06  ok
+     32      16.290      16.400   25.53x     80%       87    9.64e-06  ok
+     64       9.345       9.459   44.51x     70%       87    9.64e-06  ok
+    128      12.218      12.851   34.04x     27%       87    9.64e-06  ok
+    144      12.630      13.405   32.93x     23%       87    9.64e-06  ok
+
+=== poisson2d_60  [cpu_sparse]  (3600 x 3600) ===
+threads      min ms   median ms  speedup   effic    iters   max resid  status
+      1       1.191       1.191    1.00x    100%       87    9.64e-06  ok
+      2       0.907       0.978    1.31x     66%       87    9.64e-06  ok
+      4       0.882       0.931    1.35x     34%       87    9.64e-06  ok
+      8       1.165       1.201    1.02x     13%       87    9.64e-06  ok
+     16       2.080       2.099    0.57x      4%       87    9.64e-06  ok
+     32       3.722       3.886    0.32x      1%       87    9.64e-06  ok
+     64       7.459       7.479    0.16x      0%       87    9.64e-06  ok
+    128      24.885      25.979    0.05x      0%       87    9.64e-06  ok
+    144      29.870      30.280    0.04x      0%       87    9.64e-06  ok
+
+=== poisson2d_90  [cpu_only]  (8100 x 8100) ===
+threads      min ms   median ms  speedup   effic    iters   max resid  status
+      1    3085.930    3086.300    1.00x    100%      132    9.98e-06  ok
+      2    1581.100    1588.240    1.95x     98%      132    9.98e-06  ok
+      4     802.744     814.949    3.84x     96%      132    9.98e-06  ok
+      8     437.374     438.319    7.06x     88%      132    9.98e-06  ok
+     16     244.623     246.415   12.62x     79%      132    9.98e-06  ok
+     32     151.052     151.844   20.43x     64%      132    9.98e-06  ok
+     64     118.562     119.330   26.03x     41%      132    9.98e-06  ok
+    128      59.482      60.291   51.88x     41%      132    9.98e-06  ok
+    144      53.573      56.182   57.60x     40%      132    9.98e-06  ok
+
+=== poisson2d_90  [cpu_sparse]  (8100 x 8100) ===
+threads      min ms   median ms  speedup   effic    iters   max resid  status
+      1       4.020       4.044    1.00x    100%      132    9.98e-06  ok
+      2       2.527       2.535    1.59x     80%      132    9.98e-06  ok
+      4       1.937       1.953    2.08x     52%      132    9.98e-06  ok
+      8       2.068       2.190    1.94x     24%      132    9.98e-06  ok
+     16       3.252       3.336    1.24x      8%      132    9.98e-06  ok
+     32       5.511       5.952    0.73x      2%      132    9.98e-06  ok
+     64      10.999      11.034    0.37x      1%      132    9.98e-06  ok
+    128      39.949      40.249    0.10x      0%      132    9.98e-06  ok
+    144      45.344      45.427    0.09x      0%      132    9.98e-06  ok
+
+=== poisson2d_120  [cpu_only]  (14400 x 14400) ===
+threads      min ms   median ms  speedup   effic    iters   max resid  status
+      1   13257.800   13394.700    1.00x    100%      177    8.70e-06  ok
+      2    6790.220    6816.380    1.95x     98%      177    8.70e-06  ok
+      4    3418.470    3528.290    3.88x     97%      177    8.70e-06  ok
+      8    1930.530    1931.080    6.87x     86%      177    8.70e-06  ok
+     16    1101.710    1101.880   12.03x     75%      177    8.70e-06  ok
+     32     711.097     711.584   18.64x     58%      177    8.70e-06  ok
+     64     754.364     756.748   17.57x     27%      177    8.70e-06  ok
+    128     390.272     407.211   33.97x     27%      177    8.70e-06  ok
+    144     357.663     358.446   37.07x     26%      177    8.70e-06  ok
+
+=== poisson2d_120  [cpu_sparse]  (14400 x 14400) ===
+threads      min ms   median ms  speedup   effic    iters   max resid  status
+      1      10.052      10.309    1.00x    100%      177    8.70e-06  ok
+      2       5.368       5.393    1.87x     94%      177    8.70e-06  ok
+      4       3.514       3.578    2.86x     72%      177    8.70e-06  ok
+      8       3.318       3.348    3.03x     38%      177    8.70e-06  ok
+     16       4.632       4.780    2.17x     14%      177    8.70e-06  ok
+     32       7.592       7.672    1.32x      4%      177    8.70e-06  ok
+     64      14.433      15.107    0.70x      1%      177    8.70e-06  ok
+    128      49.023      50.658    0.21x      0%      177    8.70e-06  ok
+    144      58.414      59.295    0.17x      0%      177    8.70e-06  ok
+
+=== poisson2d_250  [cpu_sparse]  (62500 x 62500) ===
+threads      min ms   median ms  speedup   effic    iters   max resid  status
+      1      96.999      97.931    1.00x    100%      372    9.91e-06  ok
+      2      46.079      46.206    2.11x    105%      372    9.91e-06  ok
+      4      26.128      28.789    3.71x     93%      372    9.91e-06  ok
+      8      15.125      15.145    6.41x     80%      372    9.91e-06  ok
+     16      13.792      14.133    7.03x     44%      372    9.91e-06  ok
+     32      18.778      20.009    5.17x     16%      372    9.91e-06  ok
+     64      34.019      34.303    2.85x      4%      372    9.91e-06  ok
+    128     105.654     106.625    0.92x      1%      372    9.91e-06  ok
+    144     124.039     126.937    0.78x      1%      372    9.91e-06  ok
+
+=== poisson2d_500  [cpu_sparse]  (250000 x 250000) ===
+threads      min ms   median ms  speedup   effic    iters   max resid  status
+      1     766.435     793.239    1.00x    100%      752    9.63e-06  ok
+      2     365.577     416.395    2.10x    105%      752    9.63e-06  ok
+      4     182.217     204.996    4.21x    105%      752    9.63e-06  ok
+      8      95.030      95.639    8.07x    101%      752    9.63e-06  ok
+     16      59.963      60.426   12.78x     80%      752    9.63e-06  ok
+     32      55.119      55.147   13.91x     43%      752    9.63e-06  ok
+     64      75.005      75.421   10.22x     16%      752    9.63e-06  ok
+    128     222.221     230.515    3.45x      3%      752    9.63e-06  ok
+    144     253.778     254.406    3.02x      2%      752    9.63e-06  ok
+
+=== poisson2d_1000  [cpu_sparse]  (1000000 x 1000000) ===
+threads      min ms   median ms  speedup   effic    iters   max resid  status
+      1    5978.010    6089.910    1.00x    100%     1520    9.70e-06  ok
+      2    3039.000    3047.050    1.97x     98%     1520    9.70e-06  ok
+      4    1637.990    1651.360    3.65x     91%     1520    9.70e-06  ok
+      8     880.908     885.558    6.79x     85%     1520    9.70e-06  ok
+     16     444.105     445.041   13.46x     84%     1520    9.70e-06  ok
+     32     255.075     259.007   23.44x     73%     1520    9.70e-06  ok
+     64     223.489     224.603   26.75x     42%     1520    9.70e-06  ok
+    128     487.023     494.317   12.27x     10%     1520    9.70e-06  ok
+    144     581.122     584.742   10.29x      7%     1520    9.70e-06  ok
+
+=== poisson2d_2000  [cpu_sparse]  (4000000 x 4000000) ===
+threads      min ms   median ms  speedup   effic    iters   max resid  status
+      1   60628.700   60739.700    1.00x    100%     3073    9.89e-06  ok
+      2   30644.500   30651.300    1.98x     99%     3073    9.89e-06  ok
+      4   16130.100   16136.100    3.76x     94%     3073    9.89e-06  ok
+      8    8812.220    8914.780    6.88x     86%     3073    9.89e-06  ok
+     16    5606.090    5795.740   10.81x     68%     3073    9.89e-06  ok
+     32    4240.910    4250.110   14.30x     45%     3073    9.89e-06  ok
+     64    3514.170    3531.520   17.25x     27%     3073    9.89e-06  ok
+    128    1416.290    1416.670   42.81x     33%     3073    9.89e-06  ok
+    144    1858.140    1873.000   32.63x     23%     3073    9.89e-06  ok
+
+=== OVERVIEW: best time at the highest thread count ===
+matrix                          N      cpu_only ms status          cpu_sparse ms status        sparse speedup
+poisson2d_30                  900            4.193 ok                     15.357 ok                      0.3x
+poisson2d_60                 3600           12.630 ok                     29.870 ok                      0.4x
+poisson2d_90                 8100           53.573 ok                     45.344 ok                      1.2x
+poisson2d_120               14400          357.663 ok                     58.414 ok                      6.1x
+poisson2d_250               62500          skipped                       124.039 ok          
+poisson2d_500              250000          skipped                       253.778 ok          
+poisson2d_1000            1000000          skipped                       581.122 ok          
+poisson2d_2000            4000000          skipped                      1858.140 ok          
+
+=== NOT SOLVED (skipped or broke down) ===
+young1c                  [cpu_only] SKIPPED: not a real coordinate-format matrix. Header: %%MatrixMarket matrix coordinate complex symmetric
+young1c                  [cpu_sparse] SKIPPED: not a real coordinate-format matrix. Header: %%MatrixMarket matrix coordinate complex symmetric
+poisson2d_250            [cpu_only] SKIPPED: needs 31.25 GB; above MAX_DENSE_GB=4.
+poisson2d_500            [cpu_only] SKIPPED: needs 500 GB; above MAX_DENSE_GB=4.
+poisson2d_1000           [cpu_only] SKIPPED: needs 8000 GB; above MAX_DENSE_GB=4.
+poisson2d_2000           [cpu_only] SKIPPED: needs 128000 GB; above MAX_DENSE_GB=4.
+
+speedup = min time at lowest thread count / min time at N threads
+sparse speedup = cpu_only time / cpu_sparse time, both at the highest thread count
+status NO_CONVERGE / BAD usually means the matrix is not symmetric positive definite.

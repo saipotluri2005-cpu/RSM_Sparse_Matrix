@@ -1,0 +1,46 @@
+=== poisson2d_30  [cpu_only]  (900 x 900) ===
+threads      min ms   median ms  speedup   effic    iters   max resid  status
+      1      10.347      10.512    1.00x    100%       43    9.83e-06  ok
+
+=== poisson2d_30  [cpu_sparse]  (900 x 900) ===
+threads      min ms   median ms  speedup   effic    iters   max resid  status
+      1       0.151       0.152    1.00x    100%       43    9.83e-06  ok
+
+=== poisson2d_60  [cpu_only]  (3600 x 3600) ===
+threads      min ms   median ms  speedup   effic    iters   max resid  status
+      1     433.949     484.153    1.00x    100%       87    9.64e-06  ok
+
+=== poisson2d_60  [cpu_sparse]  (3600 x 3600) ===
+threads      min ms   median ms  speedup   effic    iters   max resid  status
+      1       1.178       1.191    1.00x    100%       87    9.64e-06  ok
+
+=== poisson2d_90  [cpu_only]  (8100 x 8100) ===
+threads      min ms   median ms  speedup   effic    iters   max resid  status
+      1    3055.910    3083.200    1.00x    100%      132    9.98e-06  ok
+
+=== poisson2d_90  [cpu_sparse]  (8100 x 8100) ===
+threads      min ms   median ms  speedup   effic    iters   max resid  status
+      1       4.008       4.048    1.00x    100%      132    9.98e-06  ok
+
+=== poisson2d_120  [cpu_only]  (14400 x 14400) ===
+threads      min ms   median ms  speedup   effic    iters   max resid  status
+      1   13243.300   13248.100    1.00x    100%      177    8.70e-06  ok
+
+=== poisson2d_120  [cpu_sparse]  (14400 x 14400) ===
+threads      min ms   median ms  speedup   effic    iters   max resid  status
+      1      10.096      11.590    1.00x    100%      177    8.70e-06  ok
+
+=== OVERVIEW: best time at the highest thread count ===
+matrix                          N      cpu_only ms status          cpu_sparse ms status        sparse speedup
+poisson2d_30                  900           10.347 ok                      0.151 ok                     68.6x
+poisson2d_60                 3600          433.949 ok                      1.178 ok                    368.4x
+poisson2d_90                 8100         3055.910 ok                      4.008 ok                    762.4x
+poisson2d_120               14400        13243.300 ok                     10.096 ok                   1311.7x
+
+=== NOT SOLVED (skipped or broke down) ===
+young1c                  [cpu_only] Error: Folder "../RSM_test_matrices/symmetric_matrices/young1c.mtx.gz" does not exist or is not a directory.
+young1c                  [cpu_sparse] Error: Folder "../RSM_test_matrices/symmetric_matrices/young1c.mtx.gz" does not exist or is not a directory.
+
+speedup = min time at lowest thread count / min time at N threads
+sparse speedup = cpu_only time / cpu_sparse time, both at the highest thread count
+status NO_CONVERGE / BAD usually means the matrix is not symmetric positive definite.
