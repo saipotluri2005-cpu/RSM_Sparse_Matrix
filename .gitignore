@@ -1,6 +1,7 @@
 # build outputs
 cpu_only
 cpu_sparse
+cpu_sparse_v2
 *_tsan
 *.o
 
@@ -14,3 +15,5 @@ cg_bench_perf.*.txt
 perf.data*
 cachegrind.out.*
 __pycache__/
+ablation_*/
+cg_ablation.*.txt

@@ -4,7 +4,8 @@
 #SBATCH -p gg                  # Grace-Grace (144 cores). Use gh for 72-core Grace-Hopper.
 #SBATCH -N 1
 #SBATCH -n 1
-#SBATCH -t 01:00:00
+#SBATCH -c 144                 # give the one task all 144 cores (use 72 with -p gh)
+#SBATCH -t 02:00:00
 #SBATCH -A TRA25006
 
 # ---------------------------------------------------------------------------
@@ -46,6 +47,7 @@ GEN="${GEN:-$ROOT/gen_poisson.py}"
 POISSON_SIZES="${POISSON_SIZES:-}"
 TEST_BRANCH="${TEST_BRANCH:-test_matrices}"
 export SAVE_SOLUTION=0         # cpu_sparse: don't write a solution file per run
+module load python3 > /dev/null 2>&1   # matplotlib for the plots, if the module exists
 
 for impl in $IMPLS; do
     [ -x "$ROOT/$impl" ] || { echo "ERROR: $ROOT/$impl not found. Run make first."; exit 1; }
@@ -71,10 +73,11 @@ else
     MATRICES="$WT"
 fi
 [ -d "$MATRICES" ] || { echo "ERROR: folder $MATRICES not found."; exit 1; }
+MATRICES="$(cd "$MATRICES" && pwd)"
 
 # ---- Defaults: gentle on login nodes ---------------------------------------
 HOST=$(hostname -s)
-NCORES=$(nproc)
+NCORES=$(env -u OMP_NUM_THREADS -u OMP_THREAD_LIMIT nproc)
 if [[ "$HOST" == login* && "${FORCE:-0}" != "1" ]]; then
     echo "NOTE: login node detected ($HOST). Light defaults; nproc reports $NCORES core(s)."
     echo "      Login nodes limit you to very few cores, so a thread sweep needs a compute node."

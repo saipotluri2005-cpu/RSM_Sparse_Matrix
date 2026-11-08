@@ -22,8 +22,9 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 # fixed series colors: dense = orange, sparse = blue, every plot
-COLOR = {"cpu_only": "#eb6834", "cpu_sparse": "#2a78d6"}
-NAME = {"cpu_only": "dense (cpu_only)", "cpu_sparse": "sparse CSR (cpu_sparse)"}
+COLOR = {"cpu_only": "#eb6834", "cpu_sparse": "#2a78d6", "cpu_sparse_v2": "#1baf7a"}
+NAME = {"cpu_only": "dense (cpu_only)", "cpu_sparse": "sparse CSR (cpu_sparse)",
+        "cpu_sparse_v2": "sparse CSR v2 (cpu_sparse_v2)"}
 EXTRA = ["#1baf7a", "#eda100", "#e87ba4", "#008300", "#6250d6", "#e34948"]
 INK, INK2, GRID, SURFACE = "#0b0b0b", "#52514e", "#e4e3df", "#fcfcfb"
 
@@ -106,7 +107,7 @@ def main():
     outdir = sys.argv[2] if len(sys.argv) > 2 else os.path.join(os.path.dirname(csv_path) or ".", "plots")
     os.makedirs(outdir, exist_ok=True)
     med, info = load(csv_path)
-    impls = [i for i in ("cpu_only", "cpu_sparse") if any(k[0] == i for k in info)]
+    impls = [i for i in ("cpu_only", "cpu_sparse", "cpu_sparse_v2") if any(k[0] == i for k in info)]
     impls += sorted({k[0] for k in info} - set(impls))
     tmax = max(k[2] for k in med)
 

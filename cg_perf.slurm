@@ -4,6 +4,7 @@
 #SBATCH -p gh                  # Vista Grace-Hopper node: 72 cores (use gg for 144-core Grace-Grace)
 #SBATCH -N 1
 #SBATCH -n 1
+#SBATCH -c 72                  # all cores of the gh node (use 144 with -p gg)
 #SBATCH -t 02:00:00
 #SBATCH -A TRA25006
 
@@ -79,10 +80,11 @@ NUMA_DELAY="${NUMA_DELAY:-20}"
 
 [ -x "$EXE" ] || { echo "ERROR: $EXE not found. Build it first."; exit 1; }
 [ -d "$MATRICES" ] || { echo "ERROR: folder $MATRICES not found."; exit 1; }
+MATRICES="$(cd "$MATRICES" && pwd)"
 
 # ---- Defaults: gentle on login nodes ---------------------------------------
 HOST=$(hostname -s)
-NCORES=$(nproc)
+NCORES=$(env -u OMP_NUM_THREADS -u OMP_THREAD_LIMIT nproc)
 if [[ "$HOST" == login* && "${FORCE:-0}" != "1" ]]; then
     echo "NOTE: login node detected ($HOST). Light defaults; nproc reports $NCORES core(s)."
     MAXT=$(( NCORES < 8 ? NCORES : 8 ))

@@ -1,7 +1,8 @@
 # Build and run on TACC Vista (Arm Grace CPU).
 #
-#   make                      build cpu_only (dense) and cpu_sparse (CSR)
+#   make                      build cpu_only (dense), cpu_sparse (CSR v1) and cpu_sparse_v2
 #   make bench                dense vs sparse benchmark + plots (test_matrices branch)
+#   make ablation             measure each v2 scaling fix (sbatch ablation.sh)
 #   make tsan                 ThreadSanitizer check            (PROG=cpu_only for dense)
 #   make perf                 perf stat, pinned to $(CORES)     (PROG=cpu_only for dense)
 #   make clean                remove binaries
@@ -12,7 +13,7 @@ CXXFLAGS := -std=c++20 -O3 -mcpu=native -fopenmp -Wall -Wextra -pthread -g -fno-
 TSANFLAGS := -std=c++20 -O1 -g -fsanitize=thread -mcpu=native -fopenmp -Wall -Wextra -pthread
 LDFLAGS  := -fopenmp
 
-PROGS    := cpu_only cpu_sparse
+PROGS    := cpu_only cpu_sparse cpu_sparse_v2
 PROG     ?= cpu_sparse
 
 # Matrix used by tsan/perf (small for tsan; it runs 5-15x slower)
@@ -31,6 +32,9 @@ all: $(PROGS)
 %_tsan: %.cpp
 	$(CXX) $(TSANFLAGS) $< -o $@ $(LDFLAGS)
 
+ablation: all
+	sbatch ablation.sh
+
 bench: all
 	bash benchmark.sh
 
@@ -45,6 +49,6 @@ clean:
 	rm -f $(PROGS) $(addsuffix _tsan,$(PROGS))
 
 clean-results:
-	rm -rf benchall_*/ perfrun_*/ bench_matrices/ *_solution.txt perf.data* cachegrind.out.*
+	rm -rf benchall_*/ perfrun_*/ ablation_*/ bench_matrices/ *_solution.txt perf.data* cachegrind.out.*
 
-.PHONY: all bench tsan perf clean clean-results
+.PHONY: all ablation bench tsan perf clean clean-results

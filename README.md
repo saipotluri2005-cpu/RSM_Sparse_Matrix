@@ -8,6 +8,9 @@ and benchmarked on TACC Vista.
 |---|---|---|
 | `cpu_only` | dense N×N array (baseline) | O(N²) |
 | `cpu_sparse` | CSR + RCM reordering | O(nnz) |
+| `cpu_sparse_v2` | `cpu_sparse` + scaling fixes for many cores | O(nnz) |
+
+Results, graphs and the performance analysis: [`docs/RESULTS.md`](docs/RESULTS.md).
 
 Both programs read `.mtx` / `.mtx.gz` files, solve `A x = b` with `b = 1`,
 and print the same report (matrix size, iterations, solve time, relative residual).
@@ -67,8 +70,35 @@ Output in `benchall_<jobid>/`:
   memory (dense vs CSR), thread scaling
 
 Settings: `THREADS="1 2 4 8"`, `REPS=3`, `POISSON_SIZES="30 60"`, `MAX_DENSE_GB=100`,
-`IMPLS="cpu_only cpu_sparse"`, `PERF=1`. Re-plot an old run with
+`IMPLS="cpu_only cpu_sparse"` (add `cpu_sparse_v2` to include it), `PERF=1`. Re-plot an old run with
 `python3 plot_compare.py benchall_<id>/raw.csv`.
+
+## Scaling fixes (`cpu_sparse_v2`) and the ablation study
+
+`cpu_sparse_v2` keeps `cpu_sparse`'s algorithm and output and changes how threads work
+together (details in `docs/RESULTS.md` §3):
+
+| Fix | What changes | Switch |
+|---|---|---|
+| Synchronization | per-thread partial sums on their own 64-byte cache lines, 3 barriers per iteration instead of 3 reductions + `single` + barrier | always on |
+| NUMA first-touch | matrix and all vectors written first by the thread that uses them | `FIRST_TOUCH=0/1` (default 1) |
+| Load balance | rows split so each thread gets equal nonzeros | `BALANCE=nnz/rows` (default nnz) |
+| Small matrices | at most one thread per N nonzeros | `THREAD_GRAIN=N` (default 0 = off) |
+| Placement | both sockets from the first thread | `OMP_PROC_BIND=spread` at launch |
+
+`cpu_sparse_v2` also prints an estimated `Bandwidth Achieved` in GB/s.
+
+```bash
+make
+sbatch ablation.sh                      # Poisson 120, 500, 1000, 2000; 1-144 threads
+```
+
+`ablation.sh` adds one fix at a time (`cpu_sparse` close → `cpu_sparse` spread → sync → first-touch →
+balance → thread grain), so the difference between neighbouring configurations is
+the effect of that one change. Output in `ablation_<jobid>/`: `raw.csv` and
+`plots/` (time per iteration and speedup vs threads, best time per configuration,
+achieved bandwidth). Settings: `SIZES`, `MATRICES`, `THREADS`, `REPS`, `CONFIGS`.
+Re-plot with `python3 plot_ablation.py ablation_<id>/raw.csv`.
 
 ## Profiling
 
@@ -89,8 +119,12 @@ NUMA check on the largest converged matrix. Output: `perfrun_<program>_<jobid>/`
 |---|---|
 | `cpu_only.cpp` | dense CG baseline |
 | `cpu_sparse.cpp` | CSR + RCM CG |
+| `cpu_sparse_v2.cpp` | `cpu_sparse` + switchable scaling fixes |
 | `benchmark.sh` | dense vs sparse benchmark (Slurm or interactive) |
 | `plot_compare.py` | graphs from `raw.csv` (needs matplotlib) |
+| `ablation.sh` | measures each scaling fix on its own (Slurm) |
+| `plot_ablation.py` | graphs from the ablation `raw.csv` |
+| `docs/RESULTS.md` | results, graphs, performance analysis |
 | `cg_perf.slurm` | benchmark + staged perf analysis for one program |
 | `gen_poisson.py` | Poisson test-matrix generator |
 | `Makefile` | build, bench, tsan, perf, clean |
