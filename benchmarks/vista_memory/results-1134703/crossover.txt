@@ -1,0 +1,6 @@
+asymmetric_matrices/large/af23560.mtx: HBM vs host: observed crossover in (1, 10]
+asymmetric_matrices/large/af23560.mtx: HBM vs managed: HBM already faster at first measured count 1
+asymmetric_matrices/large/memplus.mtx: HBM vs host: observed crossover in (1, 10]
+asymmetric_matrices/large/memplus.mtx: HBM vs managed: HBM already faster at first measured count 1
+asymmetric_matrices/small/bfw62a.mtx: HBM vs host: observed crossover in (1, 10]
+asymmetric_matrices/small/bfw62a.mtx: HBM vs managed: HBM already faster at first measured count 1
