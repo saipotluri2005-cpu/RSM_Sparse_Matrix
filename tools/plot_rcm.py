@@ -153,7 +153,8 @@ def spy(d, plots):
         return
     grids = defaultdict(dict)
     for f in os.listdir(sd):
-        m = re.match(r"spy_(.+)_(" + "|".join(sorted(ORDER, key=len, reverse=True)) + r")\.csv$", f)
+        # shortest matrix name first, so "x_shuffled_rcm" is (x, shuffled_rcm), not (x_shuffled, rcm)
+        m = re.match(r"spy_(.+?)_(" + "|".join(sorted(ORDER, key=len, reverse=True)) + r")\.csv$", f)
         if m:
             grids[m.group(1)][m.group(2)] = os.path.join(sd, f)
     for mat, files in grids.items():
