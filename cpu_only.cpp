@@ -1,4 +1,12 @@
+// cpu_only.cpp -- dense OpenMP Conjugate Gradient baseline.
+//
+// Environment variables: MAX_ITERS=5000  TOL=1e-5  MAX_DENSE_GB=100
+//
+// qa_rcm branch edits (MAX_ITERS/TOL, actual thread count, full-precision
+// solution file, repeated entries summed): generated with assistance of claude code
+
 #include <omp.h>
+#include <iomanip>
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -277,16 +285,21 @@ void process_matrix_file(const fs::path &file_path)
             std::cerr << "SKIPPED: bad entry index at entry " << k << ".\n";
             return;
         }
-        Ap_[(size_t)r * num_cols + cc] = v;
+        // repeated entries are summed, as cpu_sparse's COO -> CSR does
+        Ap_[(size_t)r * num_cols + cc] += v;
         if (is_symmetric && r != cc)
-            Ap_[(size_t)cc * num_cols + r] = v;
+            Ap_[(size_t)cc * num_cols + r] += v;
     }
     buf.clear(); buf.shrink_to_fit();
 
     std::vector<double> b(N, 1.0), x(N, 0.0);
 
+    const char *mi = std::getenv("MAX_ITERS"), *tl = std::getenv("TOL");
+    const int max_iters = mi ? std::atoi(mi) : 5000;
+    const double tol = tl ? std::atof(tl) : 1e-5;
+
     double t0 = omp_get_wtime();
-    int iterations = solve_dense_cg(Ap_, b.data(), x.data(), N, 5000, 1e-5);
+    int iterations = solve_dense_cg(Ap_, b.data(), x.data(), N, max_iters, tol);
     double duration_ms = (omp_get_wtime() - t0) * 1000.0;
 
     // Accuracy check (parallel)
@@ -300,7 +313,13 @@ void process_matrix_file(const fs::path &file_path)
     }
     double rel_res = std::sqrt(res2) / std::sqrt(b2);
 
-    std::cout << "Threads:            " << omp_get_max_threads() << std::endl;
+    int team = 1; // threads actually created (OMP_THREAD_LIMIT / OMP_DYNAMIC can lower it)
+#pragma omp parallel
+    {
+#pragma omp single
+        team = omp_get_num_threads();
+    }
+    std::cout << "Threads:            " << team << std::endl;
     std::cout << "Matrix Size:        " << num_rows << " x " << num_cols << std::endl;
     std::cout << "Iterations Taken:   " << iterations << std::endl;
     std::cout << "Solve Time:         " << duration_ms << " ms" << std::endl;
@@ -308,6 +327,7 @@ void process_matrix_file(const fs::path &file_path)
 
     std::string out_name = matrix_stem(file_path) + "_dense_solution.txt";
     std::ofstream out(out_name);
+    out << std::setprecision(17); // round-trip precision, so the file can be re-checked
     for (int i = 0; i < N; ++i)
         out << i << " " << x[i] << "\n";
     std::cout << "Solution saved to:  " << out_name << std::endl;

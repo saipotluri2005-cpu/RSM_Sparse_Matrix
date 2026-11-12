@@ -3,7 +3,12 @@ cpu_only
 cpu_sparse
 cpu_sparse_v2
 *_tsan
+*_clangtsan
 *.o
+tools/gen_fem
+tools/rcm_study
+tools/check_solution
+tools/omp_barrier_cost
 
 # per-run outputs (regenerate with make bench / sbatch)
 *_solution.txt
@@ -17,3 +22,5 @@ cachegrind.out.*
 __pycache__/
 ablation_*/
 cg_ablation.*.txt
+qa_rcm_*/
+vista_qa_*.txt

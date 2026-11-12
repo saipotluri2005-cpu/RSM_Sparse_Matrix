@@ -28,10 +28,19 @@
 // Thread placement is chosen at launch, not in the code:
 //   OMP_PLACES=cores OMP_PROC_BIND=spread   uses both sockets from the start.
 //
-// Other options as in v1: REORDER=none, PRECOND=jacobi, MAX_ITERS, TOL,
-// SAVE_SOLUTION=0.
+// Other options as in v1: REORDER=none, REORDER=auto, PRECOND=jacobi,
+// MAX_ITERS, TOL, SAVE_SOLUTION=0.
+//
+// The row partition assumes each parallel region runs exactly T threads.
+// OpenMP can create fewer (OMP_THREAD_LIMIT, OMP_DYNAMIC=true on a busy
+// node), which used to leave rows unprocessed (crash or wrong answer). T is
+// now the team size OpenMP actually creates, and every partitioned region
+// checks it.
 //
 // Build:  make cpu_sparse_v2
+//
+// qa_rcm branch edits (thread-team fix, REORDER=auto, full-precision
+// solution file): generated with assistance of claude code
 
 #include <omp.h>
 #include <algorithm>
@@ -41,6 +50,7 @@
 #include <cstring>
 #include <filesystem>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <memory>
 #include <numeric>
@@ -103,6 +113,18 @@ struct Partition
     int T = 1;
     std::vector<int> start;
 };
+
+// Called first in every region that uses the partition: a smaller team would
+// leave rows unprocessed, so stop instead of returning a wrong answer.
+static void require_team(int T)
+{
+    if (omp_get_num_threads() != T)
+    {
+        std::fprintf(stderr, "ERROR: partition built for %d threads, region has %d\n", T,
+                     omp_get_num_threads());
+        std::abort();
+    }
+}
 
 static inline double spmv_row(const long long *__restrict rp, const int *__restrict ci,
                               const double *__restrict val, const double *__restrict v, int i)
@@ -305,6 +327,7 @@ static CSR relocate(const CSR &A, const Partition &p)
     B.val = alloc_buf<double>(A.nnz);
 #pragma omp parallel num_threads(p.T)
     {
+        require_team(p.T);
         const int t = omp_get_thread_num();
         const int lo = p.start[t], hi = p.start[t + 1];
         for (int i = lo; i < hi; ++i) B.rp[i] = A.rp[i];
@@ -350,6 +373,7 @@ static int solve_cg_v2(const CSR &A, const Partition &part, const double *dinv,
 
 #pragma omp parallel num_threads(T)
     {
+        require_team(T);
         const int t = omp_get_thread_num();
         const int lo = part.start[t], hi = part.start[t + 1];
 
@@ -541,11 +565,24 @@ void process_matrix_file(const fs::path &file_path)
     CSR A = coo_to_csr(m, {});
     long long bw_before = bandwidth(A), bw_after = bw_before;
     std::vector<int> perm;
-    if (env_str("REORDER", "rcm") == "rcm")
+    const std::string reorder = env_str("REORDER", "rcm");
+    std::string bw_note = "  (no reordering)";
+    if (reorder == "rcm" || reorder == "auto")
     {
         perm = rcm_order(A);
-        A = coo_to_csr(m, perm);
-        bw_after = bandwidth(A);
+        CSR B = coo_to_csr(m, perm);
+        const long long bw_rcm = bandwidth(B);
+        if (reorder == "auto" && bw_rcm >= bw_before)
+        {
+            perm.clear(); // RCM would not shrink the bandwidth: keep the input order
+            bw_note = "  (RCM skipped: it would give " + std::to_string(bw_rcm) + ")";
+        }
+        else
+        {
+            A = std::move(B);
+            bw_after = bw_rcm;
+            bw_note = "  (after RCM)";
+        }
     }
     { COO tmp; std::swap(tmp, m); }
 
@@ -555,6 +592,18 @@ void process_matrix_file(const fs::path &file_path)
     int T = requested;
     if (grain > 0) T = (int)std::clamp<long long>(A.nnz / grain, 1, requested);
     T = std::min(T, std::max(1, N));
+    // Size the partition from the team OpenMP really creates; with dynamic
+    // adjustment off, every later num_threads(T) region gets the same team.
+    omp_set_dynamic(0);
+    {
+        int team = T;
+#pragma omp parallel num_threads(T)
+        {
+#pragma omp single
+            team = omp_get_num_threads();
+        }
+        T = team;
+    }
     const bool by_nnz = env_str("BALANCE", "nnz") != "rows";
     const bool first_touch = env_str("FIRST_TOUCH", "1") != "0";
     Partition part = make_partition(A, T, by_nnz);
@@ -566,8 +615,7 @@ void process_matrix_file(const fs::path &file_path)
     std::cout << "Nonzeros:           " << A.nnz << "  (" << (double)A.nnz / N << " per row)" << std::endl;
     std::printf("Sparsity:           %.6f%% nonzero  (dense would need %.3f GB, CSR uses %.4f GB)\n",
                 density * 100.0, (double)N * N * 8 / 1e9, (12.0 * A.nnz + 8.0 * (N + 1)) / 1e9);
-    std::cout << "Bandwidth:          " << bw_before << " -> " << bw_after
-              << (perm.empty() ? "  (no reordering)" : "  (after RCM)") << std::endl;
+    std::cout << "Bandwidth:          " << bw_before << " -> " << bw_after << bw_note << std::endl;
 
     // ---- vectors: placed by the owning thread when FIRST_TOUCH=1 ----
     auto b_ = alloc_buf<double>(N), x_ = alloc_buf<double>(N), r_ = alloc_buf<double>(N),
@@ -591,7 +639,10 @@ void process_matrix_file(const fs::path &file_path)
     if (first_touch)
     {
 #pragma omp parallel num_threads(T)
-        init_rows(part.start[omp_get_thread_num()], part.start[omp_get_thread_num() + 1]);
+        {
+            require_team(T);
+            init_rows(part.start[omp_get_thread_num()], part.start[omp_get_thread_num() + 1]);
+        }
     }
     else
         init_rows(0, N);
@@ -619,7 +670,9 @@ void process_matrix_file(const fs::path &file_path)
     const double ms_it = duration_ms / std::max(1, iterations);
 
     std::cout << "Threads:            " << T;
-    if (T != requested) std::cout << "  (requested " << requested << ", THREAD_GRAIN=" << grain << ")";
+    if (T != requested)
+        std::cout << "  (requested " << requested << ", THREAD_GRAIN=" << grain
+                  << ", OpenMP thread limit applies if lower)";
     std::cout << std::endl;
     std::cout << "Solver:             CG" << (jacobi ? " + Jacobi" : "") << ", CSR"
               << (perm.empty() ? "" : " + RCM") << ", v2 [sync=padded"
@@ -637,6 +690,7 @@ void process_matrix_file(const fs::path &file_path)
     {
         std::string out_name = matrix_stem(file_path) + "_csr_v2_solution.txt";
         std::ofstream out(out_name);
+        out << std::setprecision(17); // round-trip precision, so the file can be re-checked
         for (int i = 0; i < N; ++i)
             out << i << " " << x_[perm.empty() ? i : perm[i]] << "\n";
         std::cout << "Solution saved to:  " << out_name << std::endl;

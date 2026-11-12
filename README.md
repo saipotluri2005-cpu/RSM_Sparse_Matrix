@@ -12,6 +12,10 @@ and benchmarked on TACC Vista.
 
 Results, graphs and the performance analysis: [`docs/RESULTS.md`](docs/RESULTS.md).
 
+Tests (`make test`, `make race-check`), the matrix generator `tools/gen_fem`, the
+RCM study `tools/rcm_study`, solver fixes and the Vista job scripts on this branch:
+[`docs/QA_RCM.md`](docs/QA_RCM.md).
+
 Both programs read `.mtx` / `.mtx.gz` files, solve `A x = b` with `b = 1`,
 and print the same report (matrix size, iterations, solve time, relative residual).
 

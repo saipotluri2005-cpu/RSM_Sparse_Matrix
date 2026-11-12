@@ -30,9 +30,15 @@
 #   PERF=1                     also run one perf stat per (program, matrix, threads)
 #   MAX_DENSE_GB=100           cpu_only skips matrices needing more than this
 #   REORDER=none PRECOND=jacobi  passed through to cpu_sparse
+#   MAX_ITERS=5000             passed through; the summary's NO_CONVERGE test uses it
 #
 # CG only converges on symmetric positive definite matrices. Other matrices
 # are still run and timed, but are labeled NO_CONVERGE / BAD in the summary.
+#
+# raw.csv also records threads_used (as printed by the program), read_ms,
+# build_ms (COO -> CSR including RCM), bandwidth before/after, the REORDER and
+# PRECOND settings, and total_ms = read + build + solve (sparse programs).
+# qa_rcm branch edits (these columns, MAX_ITERS): generated with assistance of claude code
 # ---------------------------------------------------------------------------
 
 set -u
@@ -125,7 +131,7 @@ WORK="$OUT/work"
 mkdir -p "$OUT" "$WORK"
 CSV="$OUT/raw.csv"
 SKIPPED="$OUT/not_solved.csv"
-echo "impl,matrix,N,nnz,threads,rep,iterations,solve_ms,rel_residual" > "$CSV"
+echo "impl,matrix,N,nnz,threads,rep,iterations,solve_ms,rel_residual,threads_used,read_ms,build_ms,bw_before,bw_after,reorder,precond,total_ms" > "$CSV"
 echo "impl,matrix,reason" > "$SKIPPED"
 
 {
@@ -168,7 +174,16 @@ for f in "${FILES[@]}"; do
                 nnz=$(awk '/Nonzeros/{print $2}' <<< "$out")
                 iters=$(awk '/Iterations Taken/{print $3}' <<< "$out")
                 res=$(awk '/Relative Residual/{print $3}' <<< "$out")
-                echo "$impl,$label,$N,$nnz,$t,$rep,$iters,$ms,$res" >> "$CSV"
+                used=$(awk '/^Threads:/{print $2}' <<< "$out")
+                rd=$(awk '/^Read Time:/{print $3}' <<< "$out")
+                bd=$(awk '/^Build Time:/{print $3}' <<< "$out")
+                read -r bwb bwa <<< "$(awk '/^Bandwidth:/{print $2, $4}' <<< "$out")"
+                tot=""; ro="none"; pc="none"
+                if [ -n "$rd" ]; then
+                    tot=$(awk -v a="$rd" -v b="${bd:-0}" -v c="$ms" 'BEGIN { printf "%.3f", a + b + c }')
+                    ro="${REORDER:-rcm}"; pc="${PRECOND:-none}"
+                fi
+                echo "$impl,$label,$N,$nnz,$t,$rep,$iters,$ms,$res,$used,$rd,$bd,$bwb,$bwa,$ro,$pc,$tot" >> "$CSV"
                 printf "  threads=%-4s rep=%s  N=%-7s iters=%-5s solve=%-10s ms  resid=%s\n" \
                        "$t" "$rep" "$N" "$iters" "$ms" "$res"
             done
@@ -184,8 +199,10 @@ done
 # ---- Summary ----------------------------------------------------------------
 echo
 python3 - "$CSV" "$SKIPPED" << 'PYEOF' | tee "$OUT/summary.txt"
-import csv, sys, statistics
+import csv, os, sys, statistics
 from collections import defaultdict, OrderedDict
+
+MAX_ITERS = int(os.environ.get("MAX_ITERS", "5000"))
 
 rows = list(csv.DictReader(open(sys.argv[1])))
 skipped = list(csv.DictReader(open(sys.argv[2])))
@@ -209,7 +226,7 @@ def status(k):
     its = [int(i) for i in iters[k]]
     if rs != rs or rs == float("inf"):
         return "BAD (nan/inf)"
-    if max(its) >= 5000 or rs > 1e-4:
+    if max(its) >= MAX_ITERS or rs > 1e-4:
         return "NO_CONVERGE"
     if len(its) > 1:
         return "ITERS VARY"

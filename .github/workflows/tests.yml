@@ -1,0 +1,29 @@
+# Correctness tests and a ThreadSanitizer + Archer race check on every push.
+# Generated with assistance of claude code
+name: tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  tests:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build (GCC)
+        run: make -j4
+      - name: Correctness tests
+        run: make test
+
+  race-check:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install clang and LLVM OpenMP (includes Archer)
+        run: sudo apt-get update && sudo apt-get install -y clang-18 libomp-18-dev
+      - name: Let ThreadSanitizer map its shadow memory
+        run: sudo sysctl vm.mmap_rnd_bits=28
+      - name: Race check (ThreadSanitizer + Archer)
+        run: make -j4 race-check

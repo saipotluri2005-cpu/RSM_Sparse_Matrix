@@ -13,11 +13,15 @@
 //
 // Environment variables:
 //   REORDER=none        skip RCM                (default: rcm)
+//   REORDER=auto        apply RCM only if it shrinks the bandwidth
 //   PRECOND=jacobi      Jacobi-preconditioned CG (default: none, plain CG like cpu_only)
 //   MAX_ITERS=5000  TOL=1e-5
 //   SAVE_SOLUTION=0     do not write <name>_csr_solution.txt
 //
 // Build:  make cpu_sparse
+//
+// qa_rcm branch edits (REORDER=auto, actual thread count, full-precision
+// solution file): generated with assistance of claude code
 
 #include <omp.h>
 #include <algorithm>
@@ -27,6 +31,7 @@
 #include <cstring>
 #include <filesystem>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <memory>
 #include <numeric>
@@ -472,11 +477,24 @@ void process_matrix_file(const fs::path &file_path)
     CSR A = coo_to_csr(m, {});
     long long bw_before = bandwidth(A), bw_after = bw_before;
     std::vector<int> perm;
-    if (env_str("REORDER", "rcm") == "rcm")
+    const std::string reorder = env_str("REORDER", "rcm");
+    std::string bw_note = "  (no reordering)";
+    if (reorder == "rcm" || reorder == "auto")
     {
         perm = rcm_order(A);
-        A = coo_to_csr(m, perm);
-        bw_after = bandwidth(A);
+        CSR B = coo_to_csr(m, perm);
+        const long long bw_rcm = bandwidth(B);
+        if (reorder == "auto" && bw_rcm >= bw_before)
+        {
+            perm.clear(); // RCM would not shrink the bandwidth: keep the input order
+            bw_note = "  (RCM skipped: it would give " + std::to_string(bw_rcm) + ")";
+        }
+        else
+        {
+            A = std::move(B);
+            bw_after = bw_rcm;
+            bw_note = "  (after RCM)";
+        }
     }
     { COO tmp; std::swap(tmp, m); } // free the COO list
     double t_build = omp_get_wtime() - t_build0;
@@ -487,8 +505,7 @@ void process_matrix_file(const fs::path &file_path)
     std::cout << "Nonzeros:           " << A.nnz << "  (" << (double)A.nnz / N << " per row)" << std::endl;
     std::printf("Sparsity:           %.6f%% nonzero  (dense would need %.3f GB, CSR uses %.4f GB)\n",
                 density * 100.0, (double)N * N * 8 / 1e9, (12.0 * A.nnz + 8.0 * (N + 1)) / 1e9);
-    std::cout << "Bandwidth:          " << bw_before << " -> " << bw_after
-              << (perm.empty() ? "  (no reordering)" : "  (after RCM)") << std::endl;
+    std::cout << "Bandwidth:          " << bw_before << " -> " << bw_after << bw_note << std::endl;
 
     // ---- Jacobi preconditioner (optional) ----
     Buf<double> dinv;
@@ -524,7 +541,13 @@ void process_matrix_file(const fs::path &file_path)
     }
     double rel_res = std::sqrt(res2) / std::sqrt(b2);
 
-    std::cout << "Threads:            " << omp_get_max_threads() << std::endl;
+    int team = 1; // threads actually created (OMP_THREAD_LIMIT / OMP_DYNAMIC can lower it)
+#pragma omp parallel
+    {
+#pragma omp single
+        team = omp_get_num_threads();
+    }
+    std::cout << "Threads:            " << team << std::endl;
     std::cout << "Solver:             CG" << (dinv ? " + Jacobi" : "") << ", CSR"
               << (perm.empty() ? "" : " + RCM") << std::endl;
     std::cout << "Iterations Taken:   " << iterations << std::endl;
@@ -539,6 +562,7 @@ void process_matrix_file(const fs::path &file_path)
         // undo the permutation so the file matches cpu_only's row numbering
         std::string out_name = matrix_stem(file_path) + "_csr_solution.txt";
         std::ofstream out(out_name);
+        out << std::setprecision(17); // round-trip precision, so the file can be re-checked
         for (int i = 0; i < N; ++i)
             out << i << " " << x[perm.empty() ? i : perm[i]] << "\n";
         std::cout << "Solution saved to:  " << out_name << std::endl;
