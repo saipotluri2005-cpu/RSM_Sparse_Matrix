@@ -1,0 +1,21 @@
+Reading matrices from: "/home1/11810/aarav_lakdawala/multithreading/RSM_Sparse_Matrix/viz_heat/heat64.mtx"
+Found 1 matrix file(s) to process.
+GPU: NVIDIA GH200 120GB, 95 GiB, 132 SMs
+
+==================================================
+Processing File: viz_heat/heat64.mtx
+==================================================
+Matrix Size:        262144 x 262144
+Nonzeros:           1810432  (6.90625 per row)
+Bandwidth:          4096 -> 3104  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG, CSR + RCM, GPU [matrix=hbm], transient heat
+Right-hand Side:    b from heat64_b.mtx (heat source q)
+Heat Steps:         120  (dt = 3.56735, implicit Euler)
+Iterations Taken:   2805  (15-61 per step)
+Solve Time:         144.275 ms  (GPU CG, all steps)
+Time per Step:      1.2023 ms
+Wall Time:          1128.53 ms  (including right-hand sides and frame writes)
+Relative Residual:  9.50271e-09  (last step)
+Max Temperature:    28.8617
+Frames Written:     121 to viz_out/heat64_frames.txt

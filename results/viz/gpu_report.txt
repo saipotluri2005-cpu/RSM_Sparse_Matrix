@@ -1,0 +1,927 @@
+Reading matrices from: "/home1/11810/aarav_lakdawala/multithreading/RSM_Sparse_Matrix/viz_cases"
+Found 44 matrix file(s) to process.
+GPU: NVIDIA GH200 120GB, 95 GiB, 132 SMs
+
+==================================================
+Processing File: viz_cases/bridge_long_t00.mtx
+==================================================
+Matrix Size:        117 x 117
+Nonzeros:           1145  (9.78632 per row)
+Bandwidth:          62 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_long_t00_b.mtx
+Iterations Taken:   117
+Read Time:          0.506076 ms
+Build Time:         0.528059 ms
+Transfer Time:      0.01312 ms  (0.000 GB at 1.1 GB/s, CPU -> GPU)
+Setup Time:         26.5068 ms
+Solve Time:         1.99462 ms
+Time per Iteration: 0.0170481 ms
+Bandwidth Achieved: 1.5 GB/s (estimated)
+Result Copy:        0.002976 ms  (0.000 GB at 0.3 GB/s, GPU -> CPU)
+Relative Residual:  4.88818e-12  (CPU check of copied x; GPU says 4.88892e-12)
+Solution saved to:  viz_out/bridge_long_t00_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_long_t01.mtx
+==================================================
+Matrix Size:        117 x 117
+Nonzeros:           1145  (9.78632 per row)
+Bandwidth:          62 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_long_t01_b.mtx
+Iterations Taken:   117
+Read Time:          0.587227 ms
+Build Time:         0.569019 ms
+Transfer Time:      0.009856 ms  (0.000 GB at 1.4 GB/s, CPU -> GPU)
+Setup Time:         0.220894 ms
+Solve Time:         1.98605 ms
+Time per Iteration: 0.0169748 ms
+Bandwidth Achieved: 1.6 GB/s (estimated)
+Result Copy:        0.002784 ms  (0.000 GB at 0.3 GB/s, GPU -> CPU)
+Relative Residual:  4.26447e-12  (CPU check of copied x; GPU says 4.25797e-12)
+Solution saved to:  viz_out/bridge_long_t01_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_long_t02.mtx
+==================================================
+Matrix Size:        117 x 117
+Nonzeros:           1145  (9.78632 per row)
+Bandwidth:          62 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_long_t02_b.mtx
+Iterations Taken:   117
+Read Time:          0.465052 ms
+Build Time:         0.517275 ms
+Transfer Time:      0.0096 ms  (0.000 GB at 1.5 GB/s, CPU -> GPU)
+Setup Time:         0.212446 ms
+Solve Time:         1.98794 ms
+Time per Iteration: 0.0169909 ms
+Bandwidth Achieved: 1.6 GB/s (estimated)
+Result Copy:        0.00288 ms  (0.000 GB at 0.3 GB/s, GPU -> CPU)
+Relative Residual:  2.56212e-12  (CPU check of copied x; GPU says 2.5769e-12)
+Solution saved to:  viz_out/bridge_long_t02_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_long_t03.mtx
+==================================================
+Matrix Size:        117 x 117
+Nonzeros:           1145  (9.78632 per row)
+Bandwidth:          62 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_long_t03_b.mtx
+Iterations Taken:   117
+Read Time:          0.4415 ms
+Build Time:         0.474748 ms
+Transfer Time:      0.008992 ms  (0.000 GB at 1.6 GB/s, CPU -> GPU)
+Setup Time:         0.21843 ms
+Solve Time:         1.97283 ms
+Time per Iteration: 0.0168618 ms
+Bandwidth Achieved: 1.6 GB/s (estimated)
+Result Copy:        0.002784 ms  (0.000 GB at 0.3 GB/s, GPU -> CPU)
+Relative Residual:  7.15232e-12  (CPU check of copied x; GPU says 7.16153e-12)
+Solution saved to:  viz_out/bridge_long_t03_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_long_t04.mtx
+==================================================
+Matrix Size:        117 x 117
+Nonzeros:           1145  (9.78632 per row)
+Bandwidth:          62 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_long_t04_b.mtx
+Iterations Taken:   117
+Read Time:          0.47878 ms
+Build Time:         0.496891 ms
+Transfer Time:      0.009888 ms  (0.000 GB at 1.4 GB/s, CPU -> GPU)
+Setup Time:         0.211359 ms
+Solve Time:         1.96662 ms
+Time per Iteration: 0.0168088 ms
+Bandwidth Achieved: 1.6 GB/s (estimated)
+Result Copy:        0.002816 ms  (0.000 GB at 0.3 GB/s, GPU -> CPU)
+Relative Residual:  2.75161e-11  (CPU check of copied x; GPU says 2.75177e-11)
+Solution saved to:  viz_out/bridge_long_t04_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_long_t05.mtx
+==================================================
+Matrix Size:        117 x 117
+Nonzeros:           1145  (9.78632 per row)
+Bandwidth:          62 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_long_t05_b.mtx
+Iterations Taken:   117
+Read Time:          0.521371 ms
+Build Time:         0.801625 ms
+Transfer Time:      0.009216 ms  (0.000 GB at 1.5 GB/s, CPU -> GPU)
+Setup Time:         0.217342 ms
+Solve Time:         1.9887 ms
+Time per Iteration: 0.0169975 ms
+Bandwidth Achieved: 1.6 GB/s (estimated)
+Result Copy:        0.002784 ms  (0.000 GB at 0.3 GB/s, GPU -> CPU)
+Relative Residual:  1.19296e-11  (CPU check of copied x; GPU says 1.19307e-11)
+Solution saved to:  viz_out/bridge_long_t05_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_long_t06.mtx
+==================================================
+Matrix Size:        117 x 117
+Nonzeros:           1145  (9.78632 per row)
+Bandwidth:          62 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_long_t06_b.mtx
+Iterations Taken:   117
+Read Time:          0.454876 ms
+Build Time:         0.888792 ms
+Transfer Time:      0.008832 ms  (0.000 GB at 1.6 GB/s, CPU -> GPU)
+Setup Time:         0.208863 ms
+Solve Time:         1.96288 ms
+Time per Iteration: 0.0167768 ms
+Bandwidth Achieved: 1.6 GB/s (estimated)
+Result Copy:        0.002784 ms  (0.000 GB at 0.3 GB/s, GPU -> CPU)
+Relative Residual:  3.49764e-11  (CPU check of copied x; GPU says 3.49773e-11)
+Solution saved to:  viz_out/bridge_long_t06_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_long_t07.mtx
+==================================================
+Matrix Size:        117 x 117
+Nonzeros:           1145  (9.78632 per row)
+Bandwidth:          62 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_long_t07_b.mtx
+Iterations Taken:   117
+Read Time:          0.565659 ms
+Build Time:         0.504315 ms
+Transfer Time:      0.009088 ms  (0.000 GB at 1.6 GB/s, CPU -> GPU)
+Setup Time:         0.21363 ms
+Solve Time:         1.98304 ms
+Time per Iteration: 0.0169491 ms
+Bandwidth Achieved: 1.6 GB/s (estimated)
+Result Copy:        0.002816 ms  (0.000 GB at 0.3 GB/s, GPU -> CPU)
+Relative Residual:  4.58015e-12  (CPU check of copied x; GPU says 4.58612e-12)
+Solution saved to:  viz_out/bridge_long_t07_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_long_t08.mtx
+==================================================
+Matrix Size:        117 x 117
+Nonzeros:           1145  (9.78632 per row)
+Bandwidth:          62 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_long_t08_b.mtx
+Iterations Taken:   117
+Read Time:          0.587163 ms
+Build Time:         0.500508 ms
+Transfer Time:      0.008704 ms  (0.000 GB at 1.6 GB/s, CPU -> GPU)
+Setup Time:         0.204446 ms
+Solve Time:         1.97584 ms
+Time per Iteration: 0.0168875 ms
+Bandwidth Achieved: 1.6 GB/s (estimated)
+Result Copy:        0.002816 ms  (0.000 GB at 0.3 GB/s, GPU -> CPU)
+Relative Residual:  3.43509e-11  (CPU check of copied x; GPU says 3.43483e-11)
+Solution saved to:  viz_out/bridge_long_t08_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_long_t09.mtx
+==================================================
+Matrix Size:        117 x 117
+Nonzeros:           1145  (9.78632 per row)
+Bandwidth:          62 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_long_t09_b.mtx
+Iterations Taken:   117
+Read Time:          0.490044 ms
+Build Time:         0.503739 ms
+Transfer Time:      0.008704 ms  (0.000 GB at 1.6 GB/s, CPU -> GPU)
+Setup Time:         0.213118 ms
+Solve Time:         1.97053 ms
+Time per Iteration: 0.0168421 ms
+Bandwidth Achieved: 1.6 GB/s (estimated)
+Result Copy:        0.002784 ms  (0.000 GB at 0.3 GB/s, GPU -> CPU)
+Relative Residual:  6.29926e-12  (CPU check of copied x; GPU says 6.30004e-12)
+Solution saved to:  viz_out/bridge_long_t09_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_long_t10.mtx
+==================================================
+Matrix Size:        117 x 117
+Nonzeros:           1145  (9.78632 per row)
+Bandwidth:          62 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_long_t10_b.mtx
+Iterations Taken:   117
+Read Time:          0.604859 ms
+Build Time:         0.604314 ms
+Transfer Time:      0.008864 ms  (0.000 GB at 1.6 GB/s, CPU -> GPU)
+Setup Time:         0.208926 ms
+Solve Time:         1.96611 ms
+Time per Iteration: 0.0168044 ms
+Bandwidth Achieved: 1.6 GB/s (estimated)
+Result Copy:        0.002816 ms  (0.000 GB at 0.3 GB/s, GPU -> CPU)
+Relative Residual:  1.43815e-11  (CPU check of copied x; GPU says 1.4375e-11)
+Solution saved to:  viz_out/bridge_long_t10_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_long_t11.mtx
+==================================================
+Matrix Size:        117 x 117
+Nonzeros:           1145  (9.78632 per row)
+Bandwidth:          62 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_long_t11_b.mtx
+Iterations Taken:   117
+Read Time:          1.02655 ms
+Build Time:         0.456796 ms
+Transfer Time:      0.008896 ms  (0.000 GB at 1.6 GB/s, CPU -> GPU)
+Setup Time:         0.206686 ms
+Solve Time:         1.97731 ms
+Time per Iteration: 0.0169001 ms
+Bandwidth Achieved: 1.6 GB/s (estimated)
+Result Copy:        0.002976 ms  (0.000 GB at 0.3 GB/s, GPU -> CPU)
+Relative Residual:  2.25989e-11  (CPU check of copied x; GPU says 2.25986e-11)
+Solution saved to:  viz_out/bridge_long_t11_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_long_t12.mtx
+==================================================
+Matrix Size:        117 x 117
+Nonzeros:           1145  (9.78632 per row)
+Bandwidth:          62 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_long_t12_b.mtx
+Iterations Taken:   117
+Read Time:          0.604411 ms
+Build Time:         0.478876 ms
+Transfer Time:      0.009216 ms  (0.000 GB at 1.5 GB/s, CPU -> GPU)
+Setup Time:         0.214111 ms
+Solve Time:         1.97005 ms
+Time per Iteration: 0.016838 ms
+Bandwidth Achieved: 1.6 GB/s (estimated)
+Result Copy:        0.002784 ms  (0.000 GB at 0.3 GB/s, GPU -> CPU)
+Relative Residual:  6.05568e-12  (CPU check of copied x; GPU says 6.05897e-12)
+Solution saved to:  viz_out/bridge_long_t12_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_long_t13.mtx
+==================================================
+Matrix Size:        117 x 117
+Nonzeros:           1145  (9.78632 per row)
+Bandwidth:          62 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_long_t13_b.mtx
+Iterations Taken:   117
+Read Time:          0.493531 ms
+Build Time:         0.520604 ms
+Transfer Time:      0.00832 ms  (0.000 GB at 1.7 GB/s, CPU -> GPU)
+Setup Time:         0.211614 ms
+Solve Time:         1.9735 ms
+Time per Iteration: 0.0168676 ms
+Bandwidth Achieved: 1.6 GB/s (estimated)
+Result Copy:        0.002976 ms  (0.000 GB at 0.3 GB/s, GPU -> CPU)
+Relative Residual:  1.25159e-11  (CPU check of copied x; GPU says 1.25255e-11)
+Solution saved to:  viz_out/bridge_long_t13_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_long_t14.mtx
+==================================================
+Matrix Size:        117 x 117
+Nonzeros:           1145  (9.78632 per row)
+Bandwidth:          62 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_long_t14_b.mtx
+Iterations Taken:   117
+Read Time:          0.72681 ms
+Build Time:         0.496123 ms
+Transfer Time:      0.009312 ms  (0.000 GB at 1.5 GB/s, CPU -> GPU)
+Setup Time:         0.214974 ms
+Solve Time:         2.00582 ms
+Time per Iteration: 0.0171438 ms
+Bandwidth Achieved: 1.5 GB/s (estimated)
+Result Copy:        0.002784 ms  (0.000 GB at 0.3 GB/s, GPU -> CPU)
+Relative Residual:  1.5262e-11  (CPU check of copied x; GPU says 1.52671e-11)
+Solution saved to:  viz_out/bridge_long_t14_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_long_t15.mtx
+==================================================
+Matrix Size:        117 x 117
+Nonzeros:           1145  (9.78632 per row)
+Bandwidth:          62 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_long_t15_b.mtx
+Iterations Taken:   117
+Read Time:          0.467708 ms
+Build Time:         0.494972 ms
+Transfer Time:      0.008832 ms  (0.000 GB at 1.6 GB/s, CPU -> GPU)
+Setup Time:         0.210398 ms
+Solve Time:         2.01318 ms
+Time per Iteration: 0.0172067 ms
+Bandwidth Achieved: 1.5 GB/s (estimated)
+Result Copy:        0.002816 ms  (0.000 GB at 0.3 GB/s, GPU -> CPU)
+Relative Residual:  1.04226e-12  (CPU check of copied x; GPU says 1.03585e-12)
+Solution saved to:  viz_out/bridge_long_t15_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_long_t16.mtx
+==================================================
+Matrix Size:        117 x 117
+Nonzeros:           1145  (9.78632 per row)
+Bandwidth:          62 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_long_t16_b.mtx
+Iterations Taken:   117
+Read Time:          0.44742 ms
+Build Time:         0.411068 ms
+Transfer Time:      0.008512 ms  (0.000 GB at 1.7 GB/s, CPU -> GPU)
+Setup Time:         0.204414 ms
+Solve Time:         1.97651 ms
+Time per Iteration: 0.0168933 ms
+Bandwidth Achieved: 1.6 GB/s (estimated)
+Result Copy:        0.002784 ms  (0.000 GB at 0.3 GB/s, GPU -> CPU)
+Relative Residual:  3.41637e-12  (CPU check of copied x; GPU says 3.40053e-12)
+Solution saved to:  viz_out/bridge_long_t16_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_long_t17.mtx
+==================================================
+Matrix Size:        117 x 117
+Nonzeros:           1145  (9.78632 per row)
+Bandwidth:          62 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_long_t17_b.mtx
+Iterations Taken:   117
+Read Time:          0.51862 ms
+Build Time:         0.451964 ms
+Transfer Time:      0.008384 ms  (0.000 GB at 1.7 GB/s, CPU -> GPU)
+Setup Time:         0.202398 ms
+Solve Time:         1.98269 ms
+Time per Iteration: 0.0169461 ms
+Bandwidth Achieved: 1.6 GB/s (estimated)
+Result Copy:        0.002784 ms  (0.000 GB at 0.3 GB/s, GPU -> CPU)
+Relative Residual:  3.22766e-11  (CPU check of copied x; GPU says 3.22834e-11)
+Solution saved to:  viz_out/bridge_long_t17_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_long_t18.mtx
+==================================================
+Matrix Size:        117 x 117
+Nonzeros:           1145  (9.78632 per row)
+Bandwidth:          62 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_long_t18_b.mtx
+Iterations Taken:   117
+Read Time:          0.433212 ms
+Build Time:         0.491516 ms
+Transfer Time:      0.008384 ms  (0.000 GB at 1.7 GB/s, CPU -> GPU)
+Setup Time:         0.210751 ms
+Solve Time:         1.96877 ms
+Time per Iteration: 0.0168271 ms
+Bandwidth Achieved: 1.6 GB/s (estimated)
+Result Copy:        0.002816 ms  (0.000 GB at 0.3 GB/s, GPU -> CPU)
+Relative Residual:  2.573e-12  (CPU check of copied x; GPU says 2.59389e-12)
+Solution saved to:  viz_out/bridge_long_t18_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_long_t19.mtx
+==================================================
+Matrix Size:        117 x 117
+Nonzeros:           1145  (9.78632 per row)
+Bandwidth:          62 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_long_t19_b.mtx
+Iterations Taken:   117
+Read Time:          0.464156 ms
+Build Time:         0.465115 ms
+Transfer Time:      0.008992 ms  (0.000 GB at 1.6 GB/s, CPU -> GPU)
+Setup Time:         0.203966 ms
+Solve Time:         1.97408 ms
+Time per Iteration: 0.0168725 ms
+Bandwidth Achieved: 1.6 GB/s (estimated)
+Result Copy:        0.002816 ms  (0.000 GB at 0.3 GB/s, GPU -> CPU)
+Relative Residual:  2.72298e-11  (CPU check of copied x; GPU says 2.72285e-11)
+Solution saved to:  viz_out/bridge_long_t19_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_long_t20.mtx
+==================================================
+Matrix Size:        117 x 117
+Nonzeros:           1145  (9.78632 per row)
+Bandwidth:          62 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_long_t20_b.mtx
+Iterations Taken:   117
+Read Time:          0.627131 ms
+Build Time:         0.560795 ms
+Transfer Time:      0.009344 ms  (0.000 GB at 1.5 GB/s, CPU -> GPU)
+Setup Time:         0.208735 ms
+Solve Time:         1.9503 ms
+Time per Iteration: 0.0166693 ms
+Bandwidth Achieved: 1.6 GB/s (estimated)
+Result Copy:        0.002784 ms  (0.000 GB at 0.3 GB/s, GPU -> CPU)
+Relative Residual:  1.14053e-11  (CPU check of copied x; GPU says 1.14043e-11)
+Solution saved to:  viz_out/bridge_long_t20_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_long_t21.mtx
+==================================================
+Matrix Size:        117 x 117
+Nonzeros:           1145  (9.78632 per row)
+Bandwidth:          62 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_long_t21_b.mtx
+Iterations Taken:   117
+Read Time:          0.60137 ms
+Build Time:         0.505788 ms
+Transfer Time:      0.008736 ms  (0.000 GB at 1.6 GB/s, CPU -> GPU)
+Setup Time:         0.206143 ms
+Solve Time:         1.98467 ms
+Time per Iteration: 0.016963 ms
+Bandwidth Achieved: 1.6 GB/s (estimated)
+Result Copy:        0.002816 ms  (0.000 GB at 0.3 GB/s, GPU -> CPU)
+Relative Residual:  1.7453e-11  (CPU check of copied x; GPU says 1.74414e-11)
+Solution saved to:  viz_out/bridge_long_t21_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_long_t22.mtx
+==================================================
+Matrix Size:        117 x 117
+Nonzeros:           1145  (9.78632 per row)
+Bandwidth:          62 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_long_t22_b.mtx
+Iterations Taken:   117
+Read Time:          0.518779 ms
+Build Time:         0.430236 ms
+Transfer Time:      0.0088 ms  (0.000 GB at 1.6 GB/s, CPU -> GPU)
+Setup Time:         0.212414 ms
+Solve Time:         1.9769 ms
+Time per Iteration: 0.0168965 ms
+Bandwidth Achieved: 1.6 GB/s (estimated)
+Result Copy:        0.002848 ms  (0.000 GB at 0.3 GB/s, GPU -> CPU)
+Relative Residual:  4.52225e-12  (CPU check of copied x; GPU says 4.52913e-12)
+Solution saved to:  viz_out/bridge_long_t22_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_long_t23.mtx
+==================================================
+Matrix Size:        117 x 117
+Nonzeros:           1145  (9.78632 per row)
+Bandwidth:          62 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_long_t23_b.mtx
+Iterations Taken:   117
+Read Time:          0.503291 ms
+Build Time:         0.827161 ms
+Transfer Time:      0.008832 ms  (0.000 GB at 1.6 GB/s, CPU -> GPU)
+Setup Time:         0.200606 ms
+Solve Time:         1.98595 ms
+Time per Iteration: 0.0169739 ms
+Bandwidth Achieved: 1.6 GB/s (estimated)
+Result Copy:        0.002784 ms  (0.000 GB at 0.3 GB/s, GPU -> CPU)
+Relative Residual:  1.808e-11  (CPU check of copied x; GPU says 1.80935e-11)
+Solution saved to:  viz_out/bridge_long_t23_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_long_t24.mtx
+==================================================
+Matrix Size:        117 x 117
+Nonzeros:           1145  (9.78632 per row)
+Bandwidth:          62 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_long_t24_b.mtx
+Iterations Taken:   117
+Read Time:          0.741881 ms
+Build Time:         0.508572 ms
+Transfer Time:      0.008864 ms  (0.000 GB at 1.6 GB/s, CPU -> GPU)
+Setup Time:         0.206654 ms
+Solve Time:         1.97792 ms
+Time per Iteration: 0.0169053 ms
+Bandwidth Achieved: 1.6 GB/s (estimated)
+Result Copy:        0.002816 ms  (0.000 GB at 0.3 GB/s, GPU -> CPU)
+Relative Residual:  3.80204e-12  (CPU check of copied x; GPU says 3.8099e-12)
+Solution saved to:  viz_out/bridge_long_t24_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_long_t25.mtx
+==================================================
+Matrix Size:        117 x 117
+Nonzeros:           1145  (9.78632 per row)
+Bandwidth:          62 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_long_t25_b.mtx
+Iterations Taken:   117
+Read Time:          0.430364 ms
+Build Time:         0.517083 ms
+Transfer Time:      0.00832 ms  (0.000 GB at 1.7 GB/s, CPU -> GPU)
+Setup Time:         0.20547 ms
+Solve Time:         1.99693 ms
+Time per Iteration: 0.0170678 ms
+Bandwidth Achieved: 1.5 GB/s (estimated)
+Result Copy:        0.002784 ms  (0.000 GB at 0.3 GB/s, GPU -> CPU)
+Relative Residual:  3.6396e-11  (CPU check of copied x; GPU says 3.63913e-11)
+Solution saved to:  viz_out/bridge_long_t25_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_long_t26.mtx
+==================================================
+Matrix Size:        117 x 117
+Nonzeros:           1145  (9.78632 per row)
+Bandwidth:          62 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_long_t26_b.mtx
+Iterations Taken:   117
+Read Time:          0.441276 ms
+Build Time:         0.437821 ms
+Transfer Time:      0.0088 ms  (0.000 GB at 1.6 GB/s, CPU -> GPU)
+Setup Time:         0.207934 ms
+Solve Time:         1.97405 ms
+Time per Iteration: 0.0168722 ms
+Bandwidth Achieved: 1.6 GB/s (estimated)
+Result Copy:        0.002784 ms  (0.000 GB at 0.3 GB/s, GPU -> CPU)
+Relative Residual:  3.49924e-11  (CPU check of copied x; GPU says 3.49942e-11)
+Solution saved to:  viz_out/bridge_long_t26_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_long_t27.mtx
+==================================================
+Matrix Size:        117 x 117
+Nonzeros:           1145  (9.78632 per row)
+Bandwidth:          62 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_long_t27_b.mtx
+Iterations Taken:   117
+Read Time:          0.484668 ms
+Build Time:         0.424636 ms
+Transfer Time:      0.008832 ms  (0.000 GB at 1.6 GB/s, CPU -> GPU)
+Setup Time:         0.208542 ms
+Solve Time:         1.9831 ms
+Time per Iteration: 0.0169496 ms
+Bandwidth Achieved: 1.6 GB/s (estimated)
+Result Copy:        0.002784 ms  (0.000 GB at 0.3 GB/s, GPU -> CPU)
+Relative Residual:  6.11903e-11  (CPU check of copied x; GPU says 6.11931e-11)
+Solution saved to:  viz_out/bridge_long_t27_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_long_t28.mtx
+==================================================
+Matrix Size:        117 x 117
+Nonzeros:           1145  (9.78632 per row)
+Bandwidth:          62 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_long_t28_b.mtx
+Iterations Taken:   117
+Read Time:          0.572155 ms
+Build Time:         0.491868 ms
+Transfer Time:      0.009376 ms  (0.000 GB at 1.5 GB/s, CPU -> GPU)
+Setup Time:         0.208798 ms
+Solve Time:         1.98947 ms
+Time per Iteration: 0.017004 ms
+Bandwidth Achieved: 1.6 GB/s (estimated)
+Result Copy:        0.002784 ms  (0.000 GB at 0.3 GB/s, GPU -> CPU)
+Relative Residual:  8.80596e-11  (CPU check of copied x; GPU says 8.80568e-11)
+Solution saved to:  viz_out/bridge_long_t28_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_long_t29.mtx
+==================================================
+Matrix Size:        117 x 117
+Nonzeros:           1145  (9.78632 per row)
+Bandwidth:          62 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_long_t29_b.mtx
+Iterations Taken:   117
+Read Time:          0.452636 ms
+Build Time:         0.549787 ms
+Transfer Time:      0.009056 ms  (0.000 GB at 1.6 GB/s, CPU -> GPU)
+Setup Time:         0.21475 ms
+Solve Time:         1.9681 ms
+Time per Iteration: 0.0168213 ms
+Bandwidth Achieved: 1.6 GB/s (estimated)
+Result Copy:        0.002784 ms  (0.000 GB at 0.3 GB/s, GPU -> CPU)
+Relative Residual:  5.30751e-11  (CPU check of copied x; GPU says 5.30953e-11)
+Solution saved to:  viz_out/bridge_long_t29_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_long_t30.mtx
+==================================================
+Matrix Size:        117 x 117
+Nonzeros:           1145  (9.78632 per row)
+Bandwidth:          62 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_long_t30_b.mtx
+Iterations Taken:   117
+Read Time:          0.522011 ms
+Build Time:         0.571771 ms
+Transfer Time:      0.008256 ms  (0.000 GB at 1.7 GB/s, CPU -> GPU)
+Setup Time:         0.206846 ms
+Solve Time:         1.97165 ms
+Time per Iteration: 0.0168517 ms
+Bandwidth Achieved: 1.6 GB/s (estimated)
+Result Copy:        0.003104 ms  (0.000 GB at 0.3 GB/s, GPU -> CPU)
+Relative Residual:  4.88818e-12  (CPU check of copied x; GPU says 4.88892e-12)
+Solution saved to:  viz_out/bridge_long_t30_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_t00.mtx
+==================================================
+Matrix Size:        45 x 45
+Nonzeros:           425  (9.44444 per row)
+Bandwidth:          26 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_t00_b.mtx
+Iterations Taken:   45
+Read Time:          0.650875 ms
+Build Time:         0.450524 ms
+Transfer Time:      0.008576 ms  (0.000 GB at 0.6 GB/s, CPU -> GPU)
+Setup Time:         0.20787 ms
+Solve Time:         0.851584 ms
+Time per Iteration: 0.0189241 ms
+Bandwidth Achieved: 0.5 GB/s (estimated)
+Result Copy:        0.002752 ms  (0.000 GB at 0.1 GB/s, GPU -> CPU)
+Relative Residual:  3.21688e-12  (CPU check of copied x; GPU says 3.21485e-12)
+Solution saved to:  viz_out/bridge_t00_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_t01.mtx
+==================================================
+Matrix Size:        45 x 45
+Nonzeros:           425  (9.44444 per row)
+Bandwidth:          26 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_t01_b.mtx
+Iterations Taken:   45
+Read Time:          0.383037 ms
+Build Time:         0.713305 ms
+Transfer Time:      0.008576 ms  (0.000 GB at 0.6 GB/s, CPU -> GPU)
+Setup Time:         0.205982 ms
+Solve Time:         0.850784 ms
+Time per Iteration: 0.0189063 ms
+Bandwidth Achieved: 0.5 GB/s (estimated)
+Result Copy:        0.002752 ms  (0.000 GB at 0.1 GB/s, GPU -> CPU)
+Relative Residual:  1.50006e-12  (CPU check of copied x; GPU says 1.49878e-12)
+Solution saved to:  viz_out/bridge_t01_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_t02.mtx
+==================================================
+Matrix Size:        45 x 45
+Nonzeros:           425  (9.44444 per row)
+Bandwidth:          26 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_t02_b.mtx
+Iterations Taken:   45
+Read Time:          1.49448 ms
+Build Time:         0.790585 ms
+Transfer Time:      0.0088 ms  (0.000 GB at 0.6 GB/s, CPU -> GPU)
+Setup Time:         0.303165 ms
+Solve Time:         0.852416 ms
+Time per Iteration: 0.0189426 ms
+Bandwidth Achieved: 0.5 GB/s (estimated)
+Result Copy:        0.002784 ms  (0.000 GB at 0.1 GB/s, GPU -> CPU)
+Relative Residual:  2.19196e-12  (CPU check of copied x; GPU says 2.19098e-12)
+Solution saved to:  viz_out/bridge_t02_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_t03.mtx
+==================================================
+Matrix Size:        45 x 45
+Nonzeros:           425  (9.44444 per row)
+Bandwidth:          26 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_t03_b.mtx
+Iterations Taken:   45
+Read Time:          0.440732 ms
+Build Time:         0.470108 ms
+Transfer Time:      0.00848 ms  (0.000 GB at 0.6 GB/s, CPU -> GPU)
+Setup Time:         0.205982 ms
+Solve Time:         0.848064 ms
+Time per Iteration: 0.0188459 ms
+Bandwidth Achieved: 0.5 GB/s (estimated)
+Result Copy:        0.002784 ms  (0.000 GB at 0.1 GB/s, GPU -> CPU)
+Relative Residual:  1.23915e-12  (CPU check of copied x; GPU says 1.23627e-12)
+Solution saved to:  viz_out/bridge_t03_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_t04.mtx
+==================================================
+Matrix Size:        45 x 45
+Nonzeros:           425  (9.44444 per row)
+Bandwidth:          26 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_t04_b.mtx
+Iterations Taken:   45
+Read Time:          0.482044 ms
+Build Time:         0.444508 ms
+Transfer Time:      0.008704 ms  (0.000 GB at 0.6 GB/s, CPU -> GPU)
+Setup Time:         0.208126 ms
+Solve Time:         0.862016 ms
+Time per Iteration: 0.0191559 ms
+Bandwidth Achieved: 0.5 GB/s (estimated)
+Result Copy:        0.002848 ms  (0.000 GB at 0.1 GB/s, GPU -> CPU)
+Relative Residual:  9.91134e-13  (CPU check of copied x; GPU says 9.91242e-13)
+Solution saved to:  viz_out/bridge_t04_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_t05.mtx
+==================================================
+Matrix Size:        45 x 45
+Nonzeros:           425  (9.44444 per row)
+Bandwidth:          26 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_t05_b.mtx
+Iterations Taken:   45
+Read Time:          0.489148 ms
+Build Time:         0.495868 ms
+Transfer Time:      0.008864 ms  (0.000 GB at 0.6 GB/s, CPU -> GPU)
+Setup Time:         0.205246 ms
+Solve Time:         0.855104 ms
+Time per Iteration: 0.0190023 ms
+Bandwidth Achieved: 0.5 GB/s (estimated)
+Result Copy:        0.00288 ms  (0.000 GB at 0.1 GB/s, GPU -> CPU)
+Relative Residual:  1.81513e-12  (CPU check of copied x; GPU says 1.82371e-12)
+Solution saved to:  viz_out/bridge_t05_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_t06.mtx
+==================================================
+Matrix Size:        45 x 45
+Nonzeros:           425  (9.44444 per row)
+Bandwidth:          26 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_t06_b.mtx
+Iterations Taken:   45
+Read Time:          0.411453 ms
+Build Time:         0.48326 ms
+Transfer Time:      0.008928 ms  (0.000 GB at 0.6 GB/s, CPU -> GPU)
+Setup Time:         0.201726 ms
+Solve Time:         0.845408 ms
+Time per Iteration: 0.0187868 ms
+Bandwidth Achieved: 0.5 GB/s (estimated)
+Result Copy:        0.002752 ms  (0.000 GB at 0.1 GB/s, GPU -> CPU)
+Relative Residual:  6.1728e-13  (CPU check of copied x; GPU says 6.13421e-13)
+Solution saved to:  viz_out/bridge_t06_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_t07.mtx
+==================================================
+Matrix Size:        45 x 45
+Nonzeros:           425  (9.44444 per row)
+Bandwidth:          26 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_t07_b.mtx
+Iterations Taken:   45
+Read Time:          0.42774 ms
+Build Time:         0.4559 ms
+Transfer Time:      0.008128 ms  (0.000 GB at 0.7 GB/s, CPU -> GPU)
+Setup Time:         0.204382 ms
+Solve Time:         0.86048 ms
+Time per Iteration: 0.0191218 ms
+Bandwidth Achieved: 0.5 GB/s (estimated)
+Result Copy:        0.002688 ms  (0.000 GB at 0.1 GB/s, GPU -> CPU)
+Relative Residual:  1.08545e-12  (CPU check of copied x; GPU says 1.0828e-12)
+Solution saved to:  viz_out/bridge_t07_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_t08.mtx
+==================================================
+Matrix Size:        45 x 45
+Nonzeros:           425  (9.44444 per row)
+Bandwidth:          26 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_t08_b.mtx
+Iterations Taken:   45
+Read Time:          0.458492 ms
+Build Time:         0.425981 ms
+Transfer Time:      0.008288 ms  (0.000 GB at 0.6 GB/s, CPU -> GPU)
+Setup Time:         0.200063 ms
+Solve Time:         0.852096 ms
+Time per Iteration: 0.0189355 ms
+Bandwidth Achieved: 0.5 GB/s (estimated)
+Result Copy:        0.00272 ms  (0.000 GB at 0.1 GB/s, GPU -> CPU)
+Relative Residual:  9.98244e-13  (CPU check of copied x; GPU says 9.95529e-13)
+Solution saved to:  viz_out/bridge_t08_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_t09.mtx
+==================================================
+Matrix Size:        45 x 45
+Nonzeros:           425  (9.44444 per row)
+Bandwidth:          26 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_t09_b.mtx
+Iterations Taken:   45
+Read Time:          0.457148 ms
+Build Time:         0.509659 ms
+Transfer Time:      0.00944 ms  (0.000 GB at 0.6 GB/s, CPU -> GPU)
+Setup Time:         0.205278 ms
+Solve Time:         0.845376 ms
+Time per Iteration: 0.0187861 ms
+Bandwidth Achieved: 0.5 GB/s (estimated)
+Result Copy:        0.00272 ms  (0.000 GB at 0.1 GB/s, GPU -> CPU)
+Relative Residual:  3.99467e-12  (CPU check of copied x; GPU says 3.99561e-12)
+Solution saved to:  viz_out/bridge_t09_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_t10.mtx
+==================================================
+Matrix Size:        45 x 45
+Nonzeros:           425  (9.44444 per row)
+Bandwidth:          26 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_t10_b.mtx
+Iterations Taken:   45
+Read Time:          0.524923 ms
+Build Time:         0.484572 ms
+Transfer Time:      0.008416 ms  (0.000 GB at 0.6 GB/s, CPU -> GPU)
+Setup Time:         0.202942 ms
+Solve Time:         0.852928 ms
+Time per Iteration: 0.018954 ms
+Bandwidth Achieved: 0.5 GB/s (estimated)
+Result Copy:        0.002752 ms  (0.000 GB at 0.1 GB/s, GPU -> CPU)
+Relative Residual:  1.55951e-12  (CPU check of copied x; GPU says 1.55859e-12)
+Solution saved to:  viz_out/bridge_t10_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_t11.mtx
+==================================================
+Matrix Size:        45 x 45
+Nonzeros:           425  (9.44444 per row)
+Bandwidth:          26 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_t11_b.mtx
+Iterations Taken:   45
+Read Time:          0.429277 ms
+Build Time:         0.42454 ms
+Transfer Time:      0.009088 ms  (0.000 GB at 0.6 GB/s, CPU -> GPU)
+Setup Time:         0.203262 ms
+Solve Time:         0.855936 ms
+Time per Iteration: 0.0190208 ms
+Bandwidth Achieved: 0.5 GB/s (estimated)
+Result Copy:        0.002848 ms  (0.000 GB at 0.1 GB/s, GPU -> CPU)
+Relative Residual:  1.85675e-12  (CPU check of copied x; GPU says 1.85688e-12)
+Solution saved to:  viz_out/bridge_t11_gpu_solution.txt
+
+==================================================
+Processing File: viz_cases/bridge_t12.mtx
+==================================================
+Matrix Size:        45 x 45
+Nonzeros:           425  (9.44444 per row)
+Bandwidth:          26 -> 7  (after RCM)
+Threads:            GPU (132 SMs)
+Solver:             CG + Jacobi, CSR + RCM, GPU [matrix=hbm, spmv=cusparse, graph=on, check_every=16]
+Right-hand Side:    b from bridge_t12_b.mtx
+Iterations Taken:   45
+Read Time:          0.443036 ms
+Build Time:         0.422012 ms
+Transfer Time:      0.008352 ms  (0.000 GB at 0.6 GB/s, CPU -> GPU)
+Setup Time:         0.20579 ms
+Solve Time:         0.864704 ms
+Time per Iteration: 0.0192156 ms
+Bandwidth Achieved: 0.5 GB/s (estimated)
+Result Copy:        0.002848 ms  (0.000 GB at 0.1 GB/s, GPU -> CPU)
+Relative Residual:  3.21688e-12  (CPU check of copied x; GPU says 3.21485e-12)
+Solution saved to:  viz_out/bridge_t12_gpu_solution.txt
