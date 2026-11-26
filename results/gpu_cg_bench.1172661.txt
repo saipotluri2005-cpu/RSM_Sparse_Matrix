@@ -1,0 +1,80 @@
+name, memory.total [MiB], clocks.max.sm [MHz]
+NVIDIA GH200 120GB, 97871 MiB, 1980 MHz
+make: 'gpu_cg' is up to date.
+make: 'cpu_sparse_v2' is up to date.
+make: 'test_gpu_logic' is up to date.
+ok:   every row computed exactly once (G=2..32, 7 sizes, 3 grids)
+
+ALL PASSED (0 failures)
+wrote poisson3d_128.mtx  N = 2097152
+wrote poisson3d_192.mtx  N = 7077888
+wrote poisson3d_256.mtx  N = 16777216
+total 2139419
+drwx------ 2 aarav_lakdawala G-828326       4096 Nov 26 12:49 .
+drwx------ 2 aarav_lakdawala G-828326       4096 Nov 26 12:49 ..
+-rw------- 1 aarav_lakdawala G-828326  164221672 Nov 26 12:49 poisson3d_128.mtx
+-rw------- 1 aarav_lakdawala G-828326  576361935 Nov 26 12:49 poisson3d_192.mtx
+-rw------- 1 aarav_lakdawala G-828326 1433697848 Nov 26 12:49 poisson3d_256.mtx
+-rw------- 1 aarav_lakdawala G-828326   16482347 Nov 26 12:29 poisson3d_64.mtx
+PIPELINE=0  whole folder: 13.00 s
+PIPELINE=1  whole folder: 12.48 s
+
+Median over 3 runs (times in ms; GBps = estimated memory bandwidth of the solve)
+config                       matrix          iters     xfer     solve    ms/it    GB/s     d2h  vs CPU       res
+cpu_v2_72t                   poisson3d_128     239      nan    127.44   0.5332     769     nan    1.0x 9.96088e-06
+gpu_hbm_cusparse             poisson3d_128     239     0.60     36.61   0.1532    2621    0.07    3.5x 9.96088e-06
+gpu_hbm_cusparse_nograph     poisson3d_128     239     0.61     40.98   0.1715    2342    0.07    3.1x 9.96088e-06
+gpu_hbm_fused                poisson3d_128     239     0.61     42.80   0.1791    2242    0.07    3.0x 9.96088e-06
+gpu_hbm_fused_check1         poisson3d_128     239     0.61     45.30   0.1895    2118    0.07    2.8x 9.96088e-06
+gpu_hbm_fused_check4         poisson3d_128     239     0.62     43.37   0.1814    2213    0.07    2.9x 9.96088e-06
+gpu_hbm_fused_check64        poisson3d_128     239     0.61     43.06   0.1802    2228    0.07    3.0x 9.96088e-06
+gpu_hbm_fused_jacobi         poisson3d_128     239     0.61     45.86   0.1919    2092    0.07    2.8x 9.96088e-06
+gpu_hbm_fused_nograph        poisson3d_128     239     0.61     44.06   0.1844    2178    0.07    2.9x 9.96088e-06
+gpu_hbm_fused_pinned         poisson3d_128     239     0.52     42.86   0.1793    2239    0.07    3.0x 9.96088e-06
+gpu_host_cusparse            poisson3d_128     239     0.00    196.89   0.8238     487    0.07    0.6x 9.96088e-06
+gpu_host_fused               poisson3d_128     239     0.00    170.21   0.7122     564    0.07    0.7x 9.96088e-06
+gpu_managed_cusparse         poisson3d_128     239     1.50     36.63   0.1533    2620    0.07    3.5x 9.96088e-06
+gpu_managed_fused            poisson3d_128     239     1.47     42.77   0.1789    2244    0.07    3.0x 9.96088e-06
+cpu_v2_72t                   poisson3d_192     361      nan   1236.97   3.4265     404     nan    1.0x 9.90749e-06
+gpu_hbm_cusparse             poisson3d_192     361     1.64    182.60   0.5058    2681    0.23    6.8x 9.90749e-06
+gpu_hbm_cusparse_nograph     poisson3d_192     361     1.67    188.24   0.5214    2601    0.22    6.6x 9.90749e-06
+gpu_hbm_fused                poisson3d_192     361     1.66    219.92   0.6092    2226    0.23    5.6x 9.90749e-06
+gpu_hbm_fused_check1         poisson3d_192     361     3.38    224.11   0.6208    2185    0.23    5.5x 9.90749e-06
+gpu_hbm_fused_check4         poisson3d_192     361     1.68    220.72   0.6114    2218    0.23    5.6x 9.90749e-06
+gpu_hbm_fused_check64        poisson3d_192     361     1.66    220.11   0.6097    2224    0.23    5.6x 9.90749e-06
+gpu_hbm_fused_jacobi         poisson3d_192     361     1.66    232.14   0.6431    2109    0.23    5.3x 9.90749e-06
+gpu_hbm_fused_nograph        poisson3d_192     361     1.67    222.02   0.6150    2205    0.23    5.6x 9.90749e-06
+gpu_hbm_fused_pinned         poisson3d_192     361     1.59    220.00   0.6094    2226    0.23    5.6x 9.90749e-06
+gpu_host_cusparse            poisson3d_192     361     0.00    925.31   2.5632     529    0.19    1.3x 9.90749e-06
+gpu_host_fused               poisson3d_192     361     0.00    894.96   2.4791     547    0.20    1.4x 9.90749e-06
+gpu_managed_cusparse         poisson3d_192     361     4.12    182.44   0.5054    2684    0.23    6.8x 9.90749e-06
+gpu_managed_fused            poisson3d_192     361     4.12    220.02   0.6095    2225    0.23    5.6x 9.90749e-06
+cpu_v2_72t                   poisson3d_256     486      nan   4210.88   8.6644     379     nan    1.0x 9.29892e-06
+gpu_hbm_cusparse             poisson3d_256     486     3.71    561.89   1.1562    2782    0.48    7.5x 9.29892e-06
+gpu_hbm_cusparse_nograph     poisson3d_256     486     3.74    568.96   1.1707    2748    0.48    7.4x 9.29892e-06
+gpu_hbm_fused                poisson3d_256     486     3.72    694.62   1.4292    2250    0.48    6.1x 9.29892e-06
+gpu_hbm_fused_check1         poisson3d_256     486     3.78    700.47   1.4413    2232    0.48    6.0x 9.29892e-06
+gpu_hbm_fused_check4         poisson3d_256     486     3.72    695.96   1.4320    2246    0.48    6.1x 9.29892e-06
+gpu_hbm_fused_check64        poisson3d_256     486     3.69    694.73   1.4295    2250    0.48    6.1x 9.29892e-06
+gpu_hbm_fused_jacobi         poisson3d_256     486     3.74    734.44   1.5112    2128    0.48    5.7x 9.29892e-06
+gpu_hbm_fused_nograph        poisson3d_256     486     3.74    697.41   1.4350    2242    0.48    6.0x 9.29892e-06
+gpu_hbm_fused_pinned         poisson3d_256     486     3.66    694.90   1.4298    2250    0.49    6.1x 9.29892e-06
+gpu_host_cusparse            poisson3d_256     486     0.00   2698.87   5.5532     579    0.45    1.6x 9.29892e-06
+gpu_host_fused               poisson3d_256     486     0.00   2946.38   6.0625     531    0.45    1.4x 9.29892e-06
+gpu_managed_cusparse         poisson3d_256     486     9.25    561.62   1.1556    2783    0.47    7.5x 9.29892e-06
+gpu_managed_fused            poisson3d_256     486     9.27    694.90   1.4299    2250    0.49    6.1x 9.29892e-06
+cpu_v2_72t                   poisson3d_64      118      nan      4.43   0.0375    1362     nan    1.0x 8.13122e-06
+gpu_hbm_cusparse             poisson3d_64      118     0.18      3.77   0.0319    1568    0.01    1.2x 8.13122e-06
+gpu_hbm_cusparse_nograph     poisson3d_64      118     0.18      6.73   0.0571     877    0.01    0.7x 8.13122e-06
+gpu_hbm_fused                poisson3d_64      118     0.20      2.74   0.0233    2152    0.01    1.6x 8.13122e-06
+gpu_hbm_fused_check1         poisson3d_64      118     0.18      4.32   0.0367    1365    0.01    1.0x 8.13122e-06
+gpu_hbm_fused_check4         poisson3d_64      118     0.19      2.89   0.0245    2041    0.01    1.5x 8.13122e-06
+gpu_hbm_fused_check64        poisson3d_64      118     0.18      2.96   0.0251    1996    0.01    1.5x 8.13122e-06
+gpu_hbm_fused_jacobi         poisson3d_64      118     0.18      3.06   0.0259    1929    0.01    1.4x 8.13122e-06
+gpu_hbm_fused_nograph        poisson3d_64      118     0.18      3.32   0.0282    1776    0.01    1.3x 8.13122e-06
+gpu_hbm_fused_pinned         poisson3d_64      118     0.11      2.75   0.0233    2148    0.01    1.6x 8.13122e-06
+gpu_host_cusparse            poisson3d_64      118     0.00     14.78   0.1253     400    0.01    0.3x 8.13122e-06
+gpu_host_fused               poisson3d_64      118     0.00      8.94   0.0758     660    0.01    0.5x 8.13122e-06
+gpu_managed_cusparse         poisson3d_64      118     0.44      3.81   0.0323    1549    0.01    1.2x 8.13122e-06
+gpu_managed_fused            poisson3d_64      118     0.43      2.77   0.0235    2128    0.01    1.6x 8.13122e-06
+Full CSV: gpu_bench_1172661/results.csv
