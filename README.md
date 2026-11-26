@@ -144,6 +144,7 @@ runs without modules or `LD_LIBRARY_PATH`. Elsewhere: `make gpu CUSPARSE=/path/l
 | `VERIFY` | `1` recompute the residual on the CPU from the copied-back x |
 | `RHS` | `ones` (b = 1, as on the CPU) · `file` (b from `<name>_b.mtx`) |
 | `SOLUTION_DIR` | where `SAVE_SOLUTION=1` writes `<name>_gpu_solution.txt` (default `.`) |
+| `HEAT_STEPS`, `HEAT_DT` | transient heat: (K + I/dt) T_new = T_old/dt + b per step; `FRAME_EVERY`, `FRAME_DIR` set where T is written |
 | `PRECOND`, `REORDER`, `MAX_ITERS`, `TOL`, `SAVE_SOLUTION` | as in the CPU programs |
 
 The iteration count matches `cpu_sparse_v2` (same stopping test, same MAX_ITERS
@@ -152,25 +153,24 @@ GPU sums are added in a different order.
 
 ## FEM visualization (`viz/`, branch `FEM_visualization`)
 
-Generate a structure, solve it with `gpu_cg`, and turn the answer into a video.
+Generate a problem, solve it with `gpu_cg`, render the answer as a video.
 
 ```bash
-sbatch viz.slurm          # or: make viz   -> viz_out/bridge.mp4, viz_out/bridge_long.mp4
+sbatch viz.slurm                         # or: make viz
+VIZ=heat HEAT_N=96 sbatch viz.slurm      # only the heat block, finer grid
 ```
 
-| Step | File | What it does |
-|---|---|---|
-| 1. Generate | `viz/gen_bridge.py` | 2D steel Pratt truss: writes `<name>.mtx` (stiffness K), `<name>_b.mtx` (loads b), `<name>_mesh.txt` (joints, bars) |
-| 2. Solve | `gpu_cg` with `RHS=file SAVE_SOLUTION=1` | reads b from `<name>_b.mtx` (reordered with the matrix by RCM), writes u in the original numbering |
-| 3. Render | `viz/render_bridge.py` | checks `‖Ku − b‖/‖b‖` and compares with a direct solve, then animates the load ramp: the bridge sags (exaggerated), bars colored compression → tension |
+| Case | Generator | GPU solve | Video |
+|---|---|---|---|
+| Truck crossing a truss bridge | `viz/gen_bridge.py --moving`: K, one load vector per truck position, mesh | `RHS=file SAVE_SOLUTION=1`, one solve per position | `viz/render_bridge.py`: the truck drives across; the exact blend of neighbouring solves gives every in-between position (the structure is linear). Members colored compression / tension, deflection exaggerated |
+| Heat spreading through a block | `viz/gen_heat.py`: the poisson3d 7-point matrix plus two heat sources (`_b.mtx`) | `HEAT_STEPS=… HEAT_DT=…`: (K + I/dt) T_new = T_old/dt + q, one CG solve per step, matrix on the GPU for all steps, temperature written every `FRAME_EVERY` steps | `viz/render_heat.py`: cutaway through the hottest point, camera turning, peak-temperature chart |
 
-The structure is linear, so the displacement at x% load is x% of u: one GPU solve
-makes the whole animation. `render_bridge.py` needs numpy, scipy and matplotlib
-(ffmpeg for MP4, otherwise it writes a GIF); if the node lacks them, copy
-`viz_cases/` and `viz_out/` to a laptop and run it there.
+Both renderers check the GPU answer independently (residual, and a direct solve for the bridges)
+and stamp the GPU run (device, iterations, solve time) on the video. They need numpy, scipy and
+matplotlib; MP4 needs a working ffmpeg (Vista's does not start), otherwise they write a GIF.
 
-`RHS=file` also works for SuiteSparse matrices that ship a `<name>_b.mtx`. Folder
-scans skip `*_b.mtx` and `*_coord.mtx` files, which are not matrices.
+`RHS=file` also works for SuiteSparse matrices that ship a `<name>_b.mtx`. Folder scans skip
+`*_b.mtx` and `*_coord.mtx`, which are not matrices.
 
 ## Profiling
 
@@ -205,7 +205,9 @@ NUMA check on the largest converged matrix. Output: `perfrun_<program>_<jobid>/`
 | `test_gpu_logic.cpp` | CPU replay of the GPU kernels vs CPU CG |
 | `gpu_bench.slurm` | GPU modes vs CPU benchmark on a gh node |
 | `viz/gen_bridge.py` | truss bridge generator (matrix + loads + mesh) |
-| `viz/render_bridge.py` | bridge animation from a solved displacement vector |
+| `viz/render_bridge.py` | bridge animation from the solved load cases |
+| `viz/gen_heat.py` | heat-conduction block (poisson3d matrix + heat sources) |
+| `viz/render_heat.py` | cutaway animation of the transient heat run |
 | `viz.slurm` | generate → GPU solve → render |
 | `Makefile` | build, bench, tsan, perf, clean |
 | `cpu_high_level.txt` | pipeline plan |

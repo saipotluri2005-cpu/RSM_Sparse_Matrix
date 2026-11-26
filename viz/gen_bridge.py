@@ -11,7 +11,8 @@ diagonals. Left end pinned, right end on a roller, so the structure is stable an
 K is symmetric positive definite (CG works). Units: metres, newtons, pascals.
 
   python3 gen_bridge.py                       # 12 panels, 60 m span
-  python3 gen_bridge.py --panels 40 --truck 0.33 --out viz_cases/bridge40
+  python3 gen_bridge.py --panels 40 --truck-pos 0.33 --out viz_cases/bridge40
+  python3 gen_bridge.py --moving              # truck drives across: one GPU solve per joint
 Generated with assistance of claude code
 """
 import argparse
@@ -84,6 +85,8 @@ def main():
     ap.add_argument("--deck-load", type=float, default=20e3, help="N per metre of deck")
     ap.add_argument("--truck", type=float, default=400e3, help="point load in N (0 = none)")
     ap.add_argument("--truck-pos", type=float, default=0.33, help="fraction of span")
+    ap.add_argument("--moving", action="store_true",
+                    help="truck drives across: one load case per deck joint (<out>_tNN.mtx + _b.mtx)")
     ap.add_argument("--out", default="viz_cases/bridge")
     a = ap.parse_args()
     if a.panels < 2:
@@ -96,16 +99,37 @@ def main():
                                       a.deck_load, a.truck, a.truck_pos)
     os.makedirs(os.path.dirname(a.out) or ".", exist_ok=True)
     n = len(dof)
-    with open(a.out + ".mtx", "w") as f:
-        f.write("%%MatrixMarket matrix coordinate real symmetric\n")
-        f.write("% 2D Pratt truss bridge stiffness matrix, from gen_bridge.py\n")
-        f.write(f"{n} {n} {len(K)}\n")
-        for (r, q), v in sorted(K.items()):
-            f.write(f"{r + 1} {q + 1} {v:.17g}\n")
-    with open(a.out + "_b.mtx", "w") as f:
-        f.write("%%MatrixMarket matrix array real general\n")
-        f.write(f"{n} 1\n")
-        f.writelines(f"{v:.17g}\n" for v in rhs)
+
+    def write_case(path, b):
+        with open(path + ".mtx", "w") as f:
+            f.write("%%MatrixMarket matrix coordinate real symmetric\n")
+            f.write("% 2D Pratt truss bridge stiffness matrix, from gen_bridge.py\n")
+            f.write(f"{n} {n} {len(K)}\n")
+            for (r, q), v in sorted(K.items()):
+                f.write(f"{r + 1} {q + 1} {v:.17g}\n")
+        with open(path + "_b.mtx", "w") as f:
+            f.write("%%MatrixMarket matrix array real general\n")
+            f.write(f"{n} 1\n")
+            f.writelines(f"{v:.17g}\n" for v in b)
+
+    cases = []
+    if a.moving:
+        # one load case per deck joint: the truck standing on joint p (p = 0 and p = panels
+        # are the supports, where the truck's weight goes straight into the bearing)
+        dead = list(rhs)
+        if a.truck > 0:
+            j = max(1, min(a.panels - 1, round(a.truck_pos * a.panels)))
+            dead[dof[(j, 1)]] += a.truck          # take the fixed truck back out
+        for p in range(a.panels + 1):
+            b = list(dead)
+            if (p, 1) in dof:
+                b[dof[(p, 1)]] -= a.truck
+            write_case(f"{a.out}_t{p:02d}", b)
+            cases.append(f"{os.path.basename(a.out)}_t{p:02d}")
+    else:
+        write_case(a.out, rhs)
+        cases.append(os.path.basename(a.out))
+
     with open(a.out + "_mesh.txt", "w") as f:
         f.write(f"# bridge mesh from gen_bridge.py  panels={a.panels} span={a.panels * a.panel_len} m\n")
         f.write(f"joints {len(joints)}\n")
@@ -116,7 +140,10 @@ def main():
         for b_ in bars:
             f.write(f"{b_[0]} {b_[1]} {b_[2]} {b_[3].replace(' ', '_')}\n")
         f.write("E 200e9\n")
-    print(f"wrote {a.out}.mtx ({n} unknowns, {2 * len(K) - n} nonzeros), {a.out}_b.mtx, {a.out}_mesh.txt")
+        f.write(f"truck {a.truck} {'moving' if a.moving else a.truck_pos}\n")
+        f.write("cases " + " ".join(cases) + "\n")
+    print(f"wrote {len(cases)} load case(s) {cases[0]}..{cases[-1]} ({n} unknowns, {2 * len(K) - n} nonzeros each)"
+          f" and {a.out}_mesh.txt")
 
 
 if __name__ == "__main__":

@@ -32,6 +32,8 @@
 //   RHS=ones            (default) b = 1, as in the CPU programs
 //   RHS=file            b from <name>_b.mtx next to the matrix (gen_bridge.py, SuiteSparse)
 //   SOLUTION_DIR=.      where SAVE_SOLUTION=1 writes <name>_gpu_solution.txt
+//   HEAT_STEPS=0        > 0: transient heat, (K + I/HEAT_DT) T_new = T_old/HEAT_DT + b
+//   HEAT_DT=1           time step; FRAME_EVERY=1 and FRAME_DIR choose which T are written
 //
 // Generated with assistance of claude code
 #include "sparse_prep.hpp"
@@ -576,6 +578,99 @@ static SolveResult solve_on_gpu(GpuContext &g, const DeviceMatrix &D, const doub
 }
 
 // ---------------------------------------------------------------------------
+// Transient heat: T starts at 0; each step solves (K + I/dt) T_new = T_old/dt + q.
+// Written in increment form so the existing solver (x0 = 0) is reused unchanged:
+//   (K + I/dt) dT = q + T/dt - (K + I/dt) T,   T += dT
+// The matrix stays on the GPU for every step; the right-hand side goes over NVLink
+// each step (8N bytes) and dT comes back the same way. Every FRAME_EVERY steps the
+// CPU writes T as float32 (original numbering) for the renderer.
+// ---------------------------------------------------------------------------
+static void run_heat(GpuContext &g, Prepared &P, const DeviceMatrix &D, double *h_x, int steps,
+                     double dt, bool jacobi, int max_iters, double tol)
+{
+    const CSR &A = P.A;            // already holds K + I/dt
+    const int N = A.n;
+    const double sigma = 1.0 / dt;
+    std::vector<double> q(N, 1.0), T(N, 0.0), rhs(N);
+    if (!P.b.empty()) q = P.b;
+    double *d_rhs;
+    CK(cudaMalloc(&d_rhs, sizeof(double) * (size_t)N));
+
+    const int every = (int)std::max(1LL, env_ll("FRAME_EVERY", 1));
+    const fs::path dir = env_str("FRAME_DIR", env_str("SOLUTION_DIR", ".").c_str());
+    fs::create_directories(dir);
+    const std::string stem = matrix_stem(P.file);
+    std::ofstream index(dir / (stem + "_frames.txt"));
+    index << "# step time max_T cg_iterations file\n";
+    std::vector<float> frame(N);
+    int frames = 0;
+    auto write_frame = [&](int step, int its) {
+        double tmax = 0.0;
+        for (int i = 0; i < N; ++i)
+        {
+            const double v = T[P.perm.empty() ? i : P.perm[i]];
+            frame[i] = (float)v;
+            tmax = std::max(tmax, v);
+        }
+        char name[64];
+        std::snprintf(name, sizeof name, "_frame_%04d.bin", step);
+        std::ofstream(dir / (stem + name), std::ios::binary)
+            .write(reinterpret_cast<const char *>(frame.data()), sizeof(float) * (size_t)N);
+        index << step << " " << step * dt << " " << tmax << " " << its << " " << stem + name << "\n";
+        ++frames;
+    };
+    write_frame(0, 0);
+
+    int it_min = INT_MAX, it_max = 0;
+    long long it_total = 0;
+    double solve_ms = 0.0, last_res = 0.0;
+    auto t0 = std::chrono::steady_clock::now();
+    for (int step = 1; step <= steps; ++step)
+    {
+        double rr = 0.0;
+#pragma omp parallel for reduction(+ : rr) schedule(static)
+        for (int i = 0; i < N; ++i)
+        {
+            rhs[i] = q[i] + sigma * T[i] - spmv_row(A.rp.get(), A.ci.get(), A.val.get(), T.data(), i);
+            rr += rhs[i] * rhs[i];
+        }
+        int its = 0;
+        if (rr > 0.0)
+        {
+            CK(cudaMemcpy(d_rhs, rhs.data(), sizeof(double) * (size_t)N, cudaMemcpyHostToDevice));
+            SolveResult R = jacobi ? solve_on_gpu<true>(g, D, d_rhs, h_x, max_iters, tol)
+                                   : solve_on_gpu<false>(g, D, d_rhs, h_x, max_iters, tol);
+            its = R.iterations;
+            solve_ms += R.solve_ms;
+            last_res = R.gpu_rel_res;
+#pragma omp parallel for schedule(static)
+            for (int i = 0; i < N; ++i) T[i] += h_x[i];
+        }
+        it_min = std::min(it_min, its);
+        it_max = std::max(it_max, its);
+        it_total += its;
+        if (step % every == 0 || step == steps) write_frame(step, its);
+    }
+    const double wall_ms = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
+    double tmax = 0.0;
+    for (double v : T) tmax = std::max(tmax, v);
+
+    std::cout << "Threads:            GPU (" << g.sms << " SMs)" << std::endl;
+    std::cout << "Solver:             CG" << (jacobi ? " + Jacobi" : "") << ", CSR"
+              << (P.perm.empty() ? "" : " + RCM") << ", GPU [matrix=" << D.mode << "], transient heat" << std::endl;
+    std::cout << "Right-hand Side:    " << P.rhs_note << " (heat source q)" << std::endl;
+    std::cout << "Heat Steps:         " << steps << "  (dt = " << dt << ", implicit Euler)" << std::endl;
+    std::cout << "Iterations Taken:   " << it_total << "  (" << it_min << "-" << it_max << " per step)" << std::endl;
+    std::cout << "Solve Time:         " << solve_ms << " ms  (GPU CG, all steps)" << std::endl;
+    std::cout << "Time per Step:      " << solve_ms / steps << " ms" << std::endl;
+    std::cout << "Wall Time:          " << wall_ms << " ms  (including right-hand sides and frame writes)" << std::endl;
+    std::cout << "Relative Residual:  " << last_res << "  (last step)" << std::endl;
+    std::cout << "Max Temperature:    " << tmax << std::endl;
+    std::cout << "Frames Written:     " << frames << " to " << (dir / (stem + "_frames.txt")).string() << std::endl;
+    CK(cudaFree(d_rhs));
+}
+
+// ---------------------------------------------------------------------------
 // One matrix: upload, solve, copy back, verify, report
 // ---------------------------------------------------------------------------
 static void run_matrix(GpuContext &g, Prepared &P)
@@ -612,6 +707,22 @@ static void run_matrix(GpuContext &g, Prepared &P)
         return;
     }
 
+    // HEAT_STEPS > 0: transient heat, implicit Euler. The matrix becomes K + I/dt here,
+    // on the CPU, before it is copied to the GPU once for all the steps.
+    const int heat_steps = (int)env_ll("HEAT_STEPS", 0);
+    const double heat_dt = std::atof(env_str("HEAT_DT", "1").c_str());
+    if (heat_steps > 0)
+    {
+        if (!(heat_dt > 0.0)) { std::cout << "Skipped: HEAT_DT must be > 0\n"; return; }
+        for (int i = 0; i < N; ++i)
+        {
+            long long k = A.rp[i];
+            while (k < A.rp[i + 1] && A.ci[k] != i) ++k;
+            if (k == A.rp[i + 1]) { std::cout << "Skipped: row " << i << " has no diagonal entry\n"; return; }
+            A.val[k] += 1.0 / heat_dt;
+        }
+    }
+
     std::vector<int> rp32(N + 1);
     for (int i = 0; i <= N; ++i) rp32[i] = (int)A.rp[i];
 
@@ -627,6 +738,16 @@ static void run_matrix(GpuContext &g, Prepared &P)
     const bool jacobi = env_str("PRECOND", "none") == "jacobi";
     const int max_iters = std::atoi(env_str("MAX_ITERS", "5000").c_str());
     const double tol = std::atof(env_str("TOL", "1e-5").c_str());
+
+    if (heat_steps > 0)
+    {
+        run_heat(g, P, D, h_x, heat_steps, heat_dt, jacobi, max_iters, tol);
+        CK(cudaFreeHost(h_x));
+        if (d_b) CK(cudaFree(d_b));
+        free_matrix(D);
+        return;
+    }
+
     SolveResult R = jacobi ? solve_on_gpu<true>(g, D, d_b, h_x, max_iters, tol)
                            : solve_on_gpu<false>(g, D, d_b, h_x, max_iters, tol);
 

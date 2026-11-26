@@ -25,3 +25,4 @@ gpu_cg_bench.*.txt
 viz_cases/
 viz_out/
 fem_viz.*.txt
+viz_heat/
