@@ -57,7 +57,8 @@ static std::vector<double> make_dinv(const CSR &A)
 }
 
 // Direct serial port of solve_cg_v2 (one thread).
-static int cpu_cg(const CSR &A, const double *dinv, std::vector<double> &x, int max_iters, double tol)
+static int cpu_cg(const CSR &A, const double *dinv, std::vector<double> &x, int max_iters, double tol,
+                  const std::vector<double> &bv = {})
 {
     const int n = A.n;
     std::vector<double> r(n), z(n), p(n), ap(n);
@@ -65,10 +66,12 @@ static int cpu_cg(const CSR &A, const double *dinv, std::vector<double> &x, int 
     double bb = 0.0, rz_old = 0.0;
     for (int i = 0; i < n; ++i)
     {
-        r[i] = 1.0; z[i] = dinv ? dinv[i] : 1.0; p[i] = z[i];
-        bb += 1.0; rz_old += r[i] * z[i];
+        const double bi = bv.empty() ? 1.0 : bv[i];
+        r[i] = bi; z[i] = dinv ? dinv[i] * bi : bi; p[i] = z[i];
+        bb += bi * bi; rz_old += r[i] * z[i];
     }
     double b_norm = std::sqrt(bb);
+    if (b_norm == 0.0) b_norm = 1.0;
     for (int it = 0; it < max_iters; ++it)
     {
         spmv(A, p.data(), ap.data());
@@ -94,7 +97,8 @@ static int cpu_cg(const CSR &A, const double *dinv, std::vector<double> &x, int 
 
 // Serial replay of gpu_cg.cu's kernels and host loop.
 static int gpu_replay(const CSR &A, const double *dinv, std::vector<double> &x, int max_iters,
-                      double tol, int check_every, int *iterations_launched, int *chunks)
+                      double tol, int check_every, int *iterations_launched, int *chunks,
+                      const std::vector<double> &bv = {})
 {
     const bool PRE = dinv != nullptr;
     const int n = A.n;
@@ -104,12 +108,13 @@ static int gpu_replay(const CSR &A, const double *dinv, std::vector<double> &x, 
     // k_init
     for (int i = 0; i < n; ++i)
     {
-        r[i] = 1.0;
-        const double zi = PRE ? dinv[i] : 1.0;
+        const double bi = bv.empty() ? 1.0 : bv[i];   // k_init: b == nullptr means b = 1
+        r[i] = bi;
+        const double zi = PRE ? dinv[i] * bi : bi;
         p[i] = zi;
         if (PRE) z[i] = zi;
-        s.rz += 1.0 * zi;
-        s.bb += 1.0;
+        s.rz += bi * zi;
+        s.bb += bi * bi;
     }
     int launched = 0;
     auto iteration = [&]() {
@@ -234,6 +239,48 @@ int main()
                       c.check_every, ic, ig, launched, chunks, maxdiff, rel_residual(P.A, xg));
         EXPECT(ic == ig && maxdiff == 0.0, msg);
         EXPECT(launched - ig < 2 * c.check_every + 1, "  wasted launches < 2 chunks");
+    }
+
+    std::printf("== RHS=file: b read from <name>_b.mtx and reordered with the matrix\n");
+    {
+        // varied b, written in array format; the reordered solve, un-permuted, must
+        // match the solve in the original numbering
+        Prepared P0;
+        {
+            setenv("REORDER", "none", 1);
+            P0 = prepare_matrix("test_tmp/poisson_var_30.mtx");
+        }
+        std::vector<double> b(P0.n);
+        for (int i = 0; i < P0.n; ++i) b[i] = std::sin(0.37 * i) + 0.5;
+        {
+            std::ofstream f("test_tmp/poisson_var_30_b.mtx");
+            f << "%%MatrixMarket matrix array real general\n" << P0.n << " 1\n" << std::setprecision(17);
+            for (double v : b) f << v << "\n";
+        }
+        setenv("RHS", "file", 1);
+        Prepared Pn = prepare_matrix("test_tmp/poisson_var_30.mtx");   // REORDER=none
+        setenv("REORDER", "rcm", 1);
+        Prepared Pr = prepare_matrix("test_tmp/poisson_var_30.mtx");
+        EXPECT(Pn.skip_reason.empty() && Pr.skip_reason.empty() && !Pr.perm.empty(), "RHS file found for both orderings");
+        double bdiff = 0.0;
+        for (int i = 0; i < P0.n; ++i) bdiff = std::max(bdiff, std::fabs(Pn.b[i] - b[i]) + std::fabs(Pr.b[Pr.perm[i]] - b[i]));
+        EXPECT(bdiff == 0.0, "b read exactly and permuted with the matrix (b_new[perm[i]] = b[i])");
+        std::vector<double> xn, xr, xg;
+        cpu_cg(Pn.A, nullptr, xn, 5000, 1e-10, Pn.b);
+        int launched = 0, chunks = 0;
+        const int ic = cpu_cg(Pr.A, nullptr, xr, 5000, 1e-10, Pr.b);
+        const int ig = gpu_replay(Pr.A, nullptr, xg, 5000, 1e-10, 16, &launched, &chunks, Pr.b);
+        double dx = 0.0, dg = 0.0;
+        for (int i = 0; i < P0.n; ++i) { dx = std::max(dx, std::fabs(xr[Pr.perm[i]] - xn[i])); dg = std::max(dg, std::fabs(xg[i] - xr[i])); }
+        char msg[200];
+        std::snprintf(msg, sizeof msg, "reordered solve matches original numbering (max|dx| = %.1e), GPU replay = CPU (%d vs %d it)", dx, ig, ic);
+        EXPECT(dx < 1e-6 && dg == 0.0 && ig == ic, msg);
+        setenv("RHS", "ones", 1);
+        // companion files are not picked up as matrices
+        auto files = find_all_mtx_files("test_tmp");
+        bool none = true;
+        for (auto &f : files) if (f.filename().string().find("_b.mtx") != std::string::npos) none = false;
+        EXPECT(none, "folder scan skips *_b.mtx files");
     }
 
     std::printf("== fused SpMV thread->row mapping\n");

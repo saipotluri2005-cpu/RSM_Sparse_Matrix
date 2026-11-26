@@ -22,3 +22,6 @@ cg_ablation.*.txt
 gpu_bench_*/
 gpu_bench_matrices/
 gpu_cg_bench.*.txt
+viz_cases/
+viz_out/
+fem_viz.*.txt

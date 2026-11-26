@@ -251,7 +251,10 @@ static bool is_gz(const fs::path &p) { return ends_with(p.filename().string(), "
 static bool is_matrix_file(const fs::path &p)
 {
     std::string n = p.filename().string();
-    return ends_with(n, ".mtx") || ends_with(n, ".mtx.gz");
+    if (ends_with(n, ".gz")) n.resize(n.size() - 3);
+    if (!ends_with(n, ".mtx")) return false;
+    // companion files are not matrices: right-hand sides and node coordinates
+    return !ends_with(n, "_b.mtx") && !ends_with(n, "_coord.mtx");
 }
 static std::string matrix_stem(const fs::path &p)
 {
@@ -300,6 +303,46 @@ static std::string slurp(const fs::path &path)
 
 
 // ---------------------------------------------------------------------------
+// Right-hand side: <stem>_b.mtx (or .mtx.gz) next to the matrix, the SuiteSparse
+// convention. Matrix Market "array" (n x 1) or "coordinate" format.
+// Returns an empty vector and sets err when it is missing or malformed.
+// ---------------------------------------------------------------------------
+static std::vector<double> read_rhs(const fs::path &matrix_path, int n, std::string &err, fs::path &used)
+{
+    const fs::path dir = matrix_path.parent_path();
+    const std::string stem = matrix_stem(matrix_path);
+    used = dir / (stem + "_b.mtx");
+    if (!fs::exists(used)) used = dir / (stem + "_b.mtx.gz");
+    if (!fs::exists(used)) { err = "RHS=file but " + stem + "_b.mtx not found"; return {}; }
+    std::string buf = slurp(used);
+    size_t eol = buf.find('\n');
+    if (buf.empty() || eol == std::string::npos) { err = "cannot read " + used.string(); return {}; }
+    const bool array = buf.substr(0, eol).find("array") != std::string::npos;
+    const char *c = buf.c_str() + eol + 1;
+    while (*c == '%') { while (*c && *c != '\n') ++c; if (*c) ++c; }
+    char *end;
+    long long rows = std::strtoll(c, &end, 10); c = end;
+    long long cols = std::strtoll(c, &end, 10); c = end;
+    if (rows != n || cols != 1) { err = used.filename().string() + " is not " + std::to_string(n) + " x 1"; return {}; }
+    std::vector<double> b(n, 0.0);
+    if (array)
+        for (int i = 0; i < n; ++i) { b[i] = std::strtod(c, &end); if (end == c) { err = "short " + used.string(); return {}; } c = end; }
+    else
+    {
+        long long cnt = std::strtoll(c, &end, 10); c = end;
+        for (long long k = 0; k < cnt; ++k)
+        {
+            long long r = std::strtoll(c, &end, 10); c = end;
+            std::strtoll(c, &end, 10); c = end;
+            double v = std::strtod(c, &end); c = end;
+            if (r < 1 || r > n) { err = "bad row in " + used.string(); return {}; }
+            b[r - 1] = v;
+        }
+    }
+    return b;
+}
+
+// ---------------------------------------------------------------------------
 // prepare_matrix: everything cpu_sparse_v2 does before its solve.
 // Returns a ready CSR (RCM-reordered unless REORDER=none) or a skip reason.
 // ---------------------------------------------------------------------------
@@ -311,6 +354,8 @@ struct Prepared
     int n = 0;
     CSR A;
     std::vector<int> perm;     // perm[old] = new; empty when not reordered
+    std::vector<double> b;     // right-hand side in the reordered numbering; empty = all ones
+    std::string rhs_note = "b = 1";
     long long bw_before = 0, bw_after = 0;
     std::string bw_note;
     double read_s = 0.0, build_s = 0.0;
@@ -396,6 +441,22 @@ static Prepared prepare_matrix(const fs::path &file_path)
         }
     }
     P.A = std::move(A);
+
+    // RHS=file: use <stem>_b.mtx instead of b = 1, in the same (reordered) numbering as A
+    if (env_str("RHS", "ones") == "file")
+    {
+        std::string err;
+        fs::path used;
+        std::vector<double> b = read_rhs(file_path, P.n, err, used);
+        if (b.empty()) { P.skip_reason = "SKIPPED: " + err; return P; }
+        if (P.perm.empty()) P.b = std::move(b);
+        else
+        {
+            P.b.assign(P.n, 0.0);
+            for (int i = 0; i < P.n; ++i) P.b[P.perm[i]] = b[i];
+        }
+        P.rhs_note = "b from " + used.filename().string();
+    }
     P.build_s = omp_get_wtime() - t_build0;
     return P;
 }

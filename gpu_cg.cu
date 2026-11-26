@@ -29,6 +29,9 @@
 //   VERIFY=1            (default) recompute ||b - Ax|| on the CPU from the copied x
 //   SAVE_SOLUTION=0     (default here) 1 writes <name>_gpu_solution.txt
 //   PIPELINE=1          (default) prepare the next matrix while this one solves
+//   RHS=ones            (default) b = 1, as in the CPU programs
+//   RHS=file            b from <name>_b.mtx next to the matrix (gen_bridge.py, SuiteSparse)
+//   SOLUTION_DIR=.      where SAVE_SOLUTION=1 writes <name>_gpu_solution.txt
 //
 // Generated with assistance of claude code
 #include "sparse_prep.hpp"
@@ -108,16 +111,16 @@ __device__ inline void block_add2(double a, double b, double *oa, double *ob)
     }
 }
 
-// x = 0, r = b = 1, z = M^-1 r, p = z; rz = r.z, bb = b.b
-// (r = b - A*0 = b, exactly what the CPU computes for x = 0)
+// x = 0, r = b, z = M^-1 r, p = z; rz = r.z, bb = b.b
+// (r = b - A*0 = b, exactly what the CPU computes for x = 0). b == nullptr means b = 1.
 template <bool PRE>
-__global__ void k_init(int n, const double *__restrict dinv, double *x, double *r, double *z,
-                       double *p, CGScalars *s)
+__global__ void k_init(int n, const double *__restrict b, const double *__restrict dinv, double *x,
+                       double *r, double *z, double *p, CGScalars *s)
 {
     double rz = 0.0, bb = 0.0;
     for (int i = blockIdx.x * blockDim.x + threadIdx.x; i < n; i += gridDim.x * blockDim.x)
     {
-        const double bi = 1.0, ri = bi;
+        const double bi = b ? b[i] : 1.0, ri = bi;
         const double zi = PRE ? dinv[i] * ri : ri;
         x[i] = 0.0; r[i] = ri; p[i] = zi;
         if (PRE) z[i] = zi;
@@ -229,17 +232,17 @@ __global__ void k_update2(int n, const double *__restrict z, double *p, const CG
         p[i] = z[i] + beta * p[i];
 }
 
-// res2 += (b - A x)^2 with b = 1  (true residual, after the solve)
+// res2 += (b - A x)^2  (true residual, after the solve; b == nullptr means b = 1)
 __global__ void k_true_residual(int n, const int *__restrict rp, const int *__restrict ci,
                                 const double *__restrict val, const double *__restrict x,
-                                double *res2)
+                                const double *__restrict b, double *res2)
 {
     double acc = 0.0;
     for (int i = blockIdx.x * blockDim.x + threadIdx.x; i < n; i += gridDim.x * blockDim.x)
     {
         double ax = 0.0;
         for (int k = rp[i]; k < rp[i + 1]; ++k) ax += val[k] * x[ci[k]];
-        const double d = 1.0 - ax;
+        const double d = (b ? b[i] : 1.0) - ax;
         acc += d * d;
     }
     block_add(acc, res2);
@@ -391,8 +394,8 @@ struct SolveResult
 };
 
 template <bool PRE>
-static SolveResult solve_on_gpu(GpuContext &g, const DeviceMatrix &D, double *h_x,
-                                int max_iters, double tol)
+static SolveResult solve_on_gpu(GpuContext &g, const DeviceMatrix &D, const double *d_b,
+                                double *h_x, int max_iters, double tol)
 {
     SolveResult R;
     const int n = D.n;
@@ -479,7 +482,7 @@ static SolveResult solve_on_gpu(GpuContext &g, const DeviceMatrix &D, double *h_
     auto t_setup = std::chrono::steady_clock::now();
     CK(cudaMemsetAsync(s, 0, sizeof(CGScalars), st));
     if (PRE) k_dinv<<<vec_blocks, BLOCK, 0, st>>>(n, D.rp, D.ci, D.val, dinv);
-    k_init<PRE><<<vec_blocks, BLOCK, 0, st>>>(n, dinv, x, r, z, p, s);
+    k_init<PRE><<<vec_blocks, BLOCK, 0, st>>>(n, d_b, dinv, x, r, z, p, s);
     CK(cudaGetLastError());
 
     cudaGraphExec_t exec = nullptr;
@@ -540,11 +543,12 @@ static SolveResult solve_on_gpu(GpuContext &g, const DeviceMatrix &D, double *h_
     double *res2;
     CK(cudaMalloc(&res2, sizeof(double)));
     CK(cudaMemsetAsync(res2, 0, sizeof(double), st));
-    k_true_residual<<<vec_blocks, BLOCK, 0, st>>>(n, D.rp, D.ci, D.val, x, res2);
+    k_true_residual<<<vec_blocks, BLOCK, 0, st>>>(n, D.rp, D.ci, D.val, x, d_b, res2);
     double h_res2 = 0.0;
     CK(cudaMemcpyAsync(&h_res2, res2, sizeof(double), cudaMemcpyDeviceToHost, st));
     CK(cudaStreamSynchronize(st));
-    R.gpu_rel_res = std::sqrt(h_res2) / std::sqrt((double)n);
+    const double bb = h_s[0].bb > 0.0 ? h_s[0].bb : 1.0;
+    R.gpu_rel_res = std::sqrt(h_res2) / std::sqrt(bb);
 
     // ---- relay x back to the CPU over C2C (pinned destination) ----
     CK(cudaEventRecord(e_t0, st));
@@ -613,13 +617,18 @@ static void run_matrix(GpuContext &g, Prepared &P)
 
     DeviceMatrix D = upload_matrix(A, rp32, g.st, g.dev);
 
-    double *h_x;
+    double *h_x, *d_b = nullptr;
     CK(cudaMallocHost(&h_x, sizeof(double) * (size_t)N));
+    if (!P.b.empty())
+    {
+        CK(cudaMalloc(&d_b, sizeof(double) * (size_t)N));
+        CK(cudaMemcpy(d_b, P.b.data(), sizeof(double) * (size_t)N, cudaMemcpyHostToDevice));
+    }
     const bool jacobi = env_str("PRECOND", "none") == "jacobi";
     const int max_iters = std::atoi(env_str("MAX_ITERS", "5000").c_str());
     const double tol = std::atof(env_str("TOL", "1e-5").c_str());
-    SolveResult R = jacobi ? solve_on_gpu<true>(g, D, h_x, max_iters, tol)
-                           : solve_on_gpu<false>(g, D, h_x, max_iters, tol);
+    SolveResult R = jacobi ? solve_on_gpu<true>(g, D, d_b, h_x, max_iters, tol)
+                           : solve_on_gpu<false>(g, D, d_b, h_x, max_iters, tol);
 
     // CPU check of the copied-back x against the CPU's own copy of A
     double rel_res = R.gpu_rel_res;
@@ -630,11 +639,12 @@ static void run_matrix(GpuContext &g, Prepared &P)
 #pragma omp parallel for reduction(+ : res2, b2) schedule(static)
         for (int i = 0; i < N; ++i)
         {
-            double d = spmv_row(A.rp.get(), A.ci.get(), A.val.get(), h_x, i) - 1.0;
+            const double bi = P.b.empty() ? 1.0 : P.b[i];
+            double d = spmv_row(A.rp.get(), A.ci.get(), A.val.get(), h_x, i) - bi;
             res2 += d * d;
-            b2 += 1.0;
+            b2 += bi * bi;
         }
-        rel_res = std::sqrt(res2) / std::sqrt(b2);
+        rel_res = std::sqrt(res2) / std::sqrt(b2 > 0.0 ? b2 : 1.0);
         res_src = "CPU check of copied x";
     }
 
@@ -646,6 +656,7 @@ static void run_matrix(GpuContext &g, Prepared &P)
               << (P.perm.empty() ? "" : " + RCM") << ", GPU [matrix=" << D.mode
               << ", spmv=" << R.spmv << ", graph=" << (R.graph_used ? "on" : "off")
               << ", check_every=" << env_ll("CHECK_EVERY", 16) << "]" << std::endl;
+    std::cout << "Right-hand Side:    " << P.rhs_note << std::endl;
     std::cout << "Iterations Taken:   " << R.iterations << std::endl;
     std::cout << "Read Time:          " << P.read_s * 1000.0 << " ms" << std::endl;
     std::cout << "Build Time:         " << P.build_s * 1000.0 << " ms" << std::endl;
@@ -668,7 +679,9 @@ static void run_matrix(GpuContext &g, Prepared &P)
 
     if (env_str("SAVE_SOLUTION", "0") != "0")
     {
-        std::string out_name = matrix_stem(P.file) + "_gpu_solution.txt";
+        fs::path out_dir = env_str("SOLUTION_DIR", ".");
+        fs::create_directories(out_dir);
+        std::string out_name = (out_dir / (matrix_stem(P.file) + "_gpu_solution.txt")).string();
         std::ofstream out(out_name);
         out << std::setprecision(17);
         for (int i = 0; i < N; ++i) out << i << " " << h_x[P.perm.empty() ? i : P.perm[i]] << "\n";
@@ -676,6 +689,7 @@ static void run_matrix(GpuContext &g, Prepared &P)
     }
 
     CK(cudaFreeHost(h_x));
+    if (d_b) CK(cudaFree(d_b));
     free_matrix(D);
 }
 

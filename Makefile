@@ -7,6 +7,7 @@
 #   make gpu-run              run gpu_cg on $(MATRIX) (on a gh node, e.g. inside idev)
 #   make gpu-quick            sbatch a short benchmark (one 64^3 matrix, 1 rep)
 #   make gpu-bench            sbatch the full benchmark (all GPU modes vs CPU on a gh node)
+#   make viz                  sbatch viz.slurm: generate bridges, solve on the GPU, render MP4s
 #   make bench                dense vs sparse benchmark + plots (test_matrices branch)
 #   make ablation             measure each v2 scaling fix (sbatch ablation.sh)
 #   make tsan                 ThreadSanitizer check            (PROG=cpu_only for dense)
@@ -104,6 +105,9 @@ gpu-quick: gpu_cg cpu_sparse_v2 test_gpu_logic
 gpu-bench: gpu_cg cpu_sparse_v2 test_gpu_logic
 	sbatch gpu_bench.slurm
 
+viz: gpu_cg
+	sbatch viz.slurm
+
 %_tsan: %.cpp
 	$(CXX) $(TSANFLAGS) $< -o $@ $(LDFLAGS)
 
@@ -124,6 +128,6 @@ clean:
 	rm -f $(PROGS) $(addsuffix _tsan,$(PROGS)) gpu_cg test_gpu_logic
 
 clean-results:
-	rm -rf benchall_*/ perfrun_*/ ablation_*/ bench_matrices/ gpu_bench_*/ *_solution.txt perf.data* cachegrind.out.*
+	rm -rf benchall_*/ perfrun_*/ ablation_*/ bench_matrices/ gpu_bench_*/ viz_cases/ viz_out/ *_solution.txt perf.data* cachegrind.out.*
 
-.PHONY: all ablation bench tsan perf clean clean-results gpu gpu-info gpu-test gpu-run gpu-quick gpu-bench
+.PHONY: all ablation bench tsan perf clean clean-results gpu gpu-info gpu-test gpu-run gpu-quick gpu-bench viz
