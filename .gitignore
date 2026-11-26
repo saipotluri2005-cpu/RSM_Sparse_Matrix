@@ -2,6 +2,8 @@
 cpu_only
 cpu_sparse
 cpu_sparse_v2
+gpu_cg
+test_gpu_logic
 *_tsan
 *.o
 
@@ -17,3 +19,6 @@ cachegrind.out.*
 __pycache__/
 ablation_*/
 cg_ablation.*.txt
+gpu_bench_*/
+gpu_bench_matrices/
+gpu_cg_bench.*.txt

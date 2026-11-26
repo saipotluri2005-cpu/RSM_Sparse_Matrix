@@ -9,6 +9,7 @@ and benchmarked on TACC Vista.
 | `cpu_only` | dense N×N array (baseline) | O(N²) |
 | `cpu_sparse` | CSR + RCM reordering | O(nnz) |
 | `cpu_sparse_v2` | `cpu_sparse` + scaling fixes for many cores | O(nnz) |
+| `gpu_cg` | CSR on the H200 GPU, prepared by the Grace CPU (GH200 node) | O(nnz) |
 
 Results, graphs and the performance analysis: [`docs/RESULTS.md`](docs/RESULTS.md).
 
@@ -100,6 +101,48 @@ the effect of that one change. Output in `ablation_<jobid>/`: `raw.csv` and
 achieved bandwidth). Settings: `SIZES`, `MATRICES`, `THREADS`, `REPS`, `CONFIGS`.
 Re-plot with `python3 plot_ablation.py ablation_<id>/raw.csv`.
 
+## GPU solver (`gpu_cg`, GH200 nodes)
+
+On a Vista `gh` node the 72-core Grace CPU and the H200 GPU are joined by
+NVLink-C2C (~450 GB/s each way, cache coherent). CG is memory-bound and runs
+hundreds of iterations on the same matrix, so the split is:
+
+| Step | Where | Why |
+|---|---|---|
+| read `.mtx`, COO, RCM, CSR | CPU (OpenMP) | branchy, one pass; reuses the CPU code (`sparse_prep.hpp`) |
+| copy CSR to GPU memory | NVLink-C2C, **once** | ~400 GB/s, a few ms even for 100M nonzeros |
+| every CG iteration | GPU (HBM3, ~4 TB/s) | the matrix is read every iteration: ~8× the CPU's memory bandwidth |
+| alpha, beta, convergence test | GPU (one thread) | the CPU never waits on a dot product |
+| "done yet?" | 48 bytes to the CPU every `CHECK_EVERY` iterations | the GPU runs one chunk ahead, so it never idles |
+| solution x | NVLink-C2C, once, into pinned memory | then the CPU checks the residual |
+| next matrix | CPU prepares it while the GPU solves this one | `PIPELINE=1` |
+
+The SpMV is not split between CPU and GPU: the CPU would add ~12% more
+bandwidth but force a CPU–GPU sync every iteration.
+
+```bash
+module unload nvidia/24.7; module load gcc/14.2.0 cuda/13.3
+make gpu-test            # checks the GPU logic on the CPU (no GPU needed)
+make gpu                 # needs nvcc: on a gh node or after the module load
+./gpu_cg Matrices        # same report as the CPU programs, plus transfer times
+sbatch gpu_bench.slurm   # all modes below + cpu_sparse_v2 on 72 cores, median table
+```
+
+| Option | Values (default first) |
+|---|---|
+| `GPU_MATRIX` | `hbm` copy once · `managed` unified memory + prefetch · `host` GPU reads CPU memory over C2C every iteration |
+| `SPMV` | `cusparse` · `fused` (our kernel: Ap and p·Ap in one pass) |
+| `CUDA_GRAPH` | `1` one graph launch per chunk · `0` plain launches |
+| `CHECK_EVERY` | `16` iterations between "done?" checks |
+| `STAGE` | `pageable` · `pinned` (cudaHostRegister the CSR before the copy) |
+| `PIPELINE` | `1` prepare the next matrix during this solve · `0` |
+| `VERIFY` | `1` recompute the residual on the CPU from the copied-back x |
+| `PRECOND`, `REORDER`, `MAX_ITERS`, `TOL`, `SAVE_SOLUTION` | as in the CPU programs |
+
+The iteration count matches `cpu_sparse_v2` (same stopping test, same MAX_ITERS
+rule; `test_gpu_logic` checks this). x can differ in the last digits because
+GPU sums are added in a different order.
+
 ## Profiling
 
 ```bash
@@ -127,6 +170,11 @@ NUMA check on the largest converged matrix. Output: `perfrun_<program>_<jobid>/`
 | `docs/RESULTS.md` | results, graphs, performance analysis |
 | `cg_perf.slurm` | benchmark + staged perf analysis for one program |
 | `gen_poisson.py` | Poisson test-matrix generator |
+| `gpu_cg.cu` | GPU CG (CUDA + cuSPARSE), CPU prepares, GPU solves |
+| `sparse_prep.hpp` | read/RCM/CSR code shared by the GPU solver and its test |
+| `gpu_cg_logic.hpp` | per-iteration scalar logic run on the GPU (and in the test) |
+| `test_gpu_logic.cpp` | CPU replay of the GPU kernels vs CPU CG |
+| `gpu_bench.slurm` | GPU modes vs CPU benchmark on a gh node |
 | `Makefile` | build, bench, tsan, perf, clean |
 | `cpu_high_level.txt` | pipeline plan |
 | `resources.md` | where to get matrices |
