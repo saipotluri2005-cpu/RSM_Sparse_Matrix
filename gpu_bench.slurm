@@ -41,11 +41,13 @@ make gpu_cg cpu_sparse_v2 test_gpu_logic || exit 1
 ./test_gpu_logic | tail -3 || exit 1
 
 # ---- 2. matrices -----------------------------------------------------------
-MDIR="$ROOT/gpu_bench_matrices"
-mkdir -p "$MDIR"
-for s in $SIZES; do
-    [ -f "$MDIR/poisson3d_$s.mtx" ] || (cd "$MDIR" && python3 "$ROOT/gen_poisson.py" --3d "$s")
-done
+MDIR="${TEST_DIR:-$ROOT/gpu_bench_matrices}"
+if [ -z "${TEST_DIR:-}" ]; then
+    mkdir -p "$MDIR"
+    for s in $SIZES; do
+        [ -f "$MDIR/poisson3d_$s.mtx" ] || (cd "$MDIR" && python3 "$ROOT/gen_poisson.py" --3d "$s")
+    done
+fi
 ls -la "$MDIR"
 
 # ---- helpers ---------------------------------------------------------------
@@ -55,11 +57,12 @@ export SAVE_SOLUTION=0
 field() { awk -v k="$1" -v c="$2" 'index($0,k)==1{print $c; exit}' <<< "$3"; }
 run() { # run <config-name> <command...>   (env vars set by caller)
     local name="$1"; shift
-    for f in "$MDIR"/poisson3d_*.mtx; do
+    for f in $(find "$MDIR" -name '*.mtx' -o -name '*.mtx.gz' | sort); do
+        m=$(basename "$f"); m=${m%.gz}; m=${m%.mtx}
         for r in $(seq "$REPS"); do
             out=$("$@" "$f" 2>&1)
-            echo "$out" > "$OUT/${name}_$(basename "$f" .mtx)_r$r.log"
-            echo "$name,$(basename "$f" .mtx),$(field 'Matrix Size' 3 "$out"),$(field 'Nonzeros' 2 "$out"),$(field 'Iterations Taken' 3 "$out"),$(field 'Transfer Time' 3 "$out"),$(field 'Solve Time' 3 "$out"),$(field 'Time per Iteration' 4 "$out"),$(field 'Bandwidth Achieved' 3 "$out"),$(field 'Result Copy' 3 "$out"),$(field 'Relative Residual' 3 "$out")" >> "$CSV"
+            echo "$out" > "$OUT/${name}_${m}_r$r.log"
+            echo "$name,$m,$(field 'Matrix Size' 3 "$out"),$(field 'Nonzeros' 2 "$out"),$(field 'Iterations Taken' 3 "$out"),$(field 'Transfer Time' 3 "$out"),$(field 'Solve Time' 3 "$out"),$(field 'Time per Iteration' 4 "$out"),$(field 'Bandwidth Achieved' 3 "$out"),$(field 'Result Copy' 3 "$out"),$(field 'Relative Residual' 3 "$out")" >> "$CSV"
         done
     done
 }
